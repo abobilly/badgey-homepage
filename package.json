@@ -1,0 +1,8 @@
+{
+  "name": "badgey-homepage",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler pages deploy . --project-name=badgey-homepage"
+  }
+}
