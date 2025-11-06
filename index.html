@@ -14,74 +14,124 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-      background: linear-gradient(135deg, hsl(217, 91%, 60%) 0%, hsl(217, 91%, 70%) 100%);
-      color: hsl(0, 0%, 10%);
+      background: linear-gradient(135deg, #EADCB3 0%, #C1B399 55%, #EADCB3 100%);
+      color: #18110F;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
       padding: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: absolute;
+      inset: -30%;
+      background: radial-gradient(circle at top right, rgba(22, 99, 132, 0.22), transparent 60%);
+      pointer-events: none;
+      transform: rotate(-12deg);
     }
 
     main {
-      background: hsl(0, 0%, 100%);
-      max-width: 520px;
+      position: relative;
+      background: rgba(255, 255, 255, 0.82);
+      max-width: 620px;
       width: 100%;
-      padding: 64px 48px;
-      border-radius: 16px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+      padding: 72px 64px;
+      border-radius: 28px;
+      border: 1px solid rgba(193, 179, 153, 0.45);
+      box-shadow: 0 40px 90px rgba(24, 17, 15, 0.16);
       display: grid;
       gap: 32px;
       text-align: center;
+      backdrop-filter: blur(18px);
+      isolation: isolate;
+    }
+
+    main::before {
+      content: "";
+      position: absolute;
+      right: -40px;
+      bottom: -40px;
+      width: 200px;
+      height: 200px;
+      background: url('/logo.svg') no-repeat center/contain;
+      opacity: 0.07;
+      pointer-events: none;
     }
 
     .logo {
-      width: 80px;
-      height: 80px;
+      width: 160px;
+      height: 160px;
       margin: 0 auto;
+      filter: drop-shadow(0 16px 40px rgba(24, 17, 15, 0.2));
     }
 
     h1 {
-      font-size: 3rem;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      color: hsl(0, 0%, 10%);
-      line-height: 1.1;
+      font-size: 3.25rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      color: #B88622;
+      line-height: 1.05;
+    }
+
+    .tagline {
+      font-size: 1.125rem;
+      color: #76542A;
+      line-height: 1.6;
     }
 
     .cta {
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       text-decoration: none;
-      color: white;
-      background: hsl(217, 91%, 60%);
-      padding: 16px 48px;
-      border-radius: 8px;
-      font-weight: 500;
-      font-size: 1rem;
-      transition: all 0.2s;
+      color: #EADCB3;
+      background: #166384;
+      padding: 18px 56px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 1.05rem;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
       border: none;
+      box-shadow: 0 16px 34px rgba(22, 99, 132, 0.28);
     }
 
     .cta:hover {
-      background: hsl(217, 91%, 55%);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(69, 137, 255, 0.3);
+      background: #17383E;
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 24px 48px rgba(22, 56, 62, 0.3);
     }
 
     footer {
-      font-size: 0.875rem;
-      color: hsl(0, 0%, 55%);
-      padding-top: 16px;
-      border-top: 1px solid hsl(0, 0%, 90%);
+      font-size: 0.95rem;
+      color: #76542A;
+      padding-top: 20px;
+      border-top: 1px solid rgba(193, 179, 153, 0.4);
     }
 
     @media (max-width: 640px) {
+      body {
+        padding: 24px;
+      }
+
       main {
-        padding: 48px 32px;
+        padding: 56px 32px;
+      }
+
+      .logo {
+        width: 120px;
+        height: 120px;
       }
 
       h1 {
-        font-size: 2.25rem;
+        font-size: 2.5rem;
+      }
+
+      .cta {
+        width: 100%;
       }
     }
   </style>
@@ -90,6 +140,9 @@
   <main>
     <img src="/logo.svg" alt="Badgey Logo" class="logo" />
     <h1>Badgey</h1>
+    <p class="tagline">
+      The badge for operators who keep Gmail, Calendar, Tasks, and Drive in perfect sync.
+    </p>
     <a href="https://app.badgey.org" class="cta">Launch App</a>
     <footer>
       Built for one operator. Keep your Google login safe.
