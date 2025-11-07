@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "deploy": "wrangler pages deploy . --project-name=badgey-homepage"
+    "deploy": "wrangler pages deploy . --project-name=badgey-homepage",
+    "tokens:check": "node ./scripts/check-tokens.mjs"
   }
 }

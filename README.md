@@ -13,3 +13,8 @@
 - **Do** document any new surface or blur requirement inside `index.html` next to the token block before using it.
 - **Don't** introduce bespoke hex codes, rgba strings, or inline opacity modifiers.
 - **Don't** override token values per component; adjust the shared definitions if contrast changes are required.
+
+## Token Guard
+- This repo shares the same guard as the frontend. Run `npm run tokens:check` (which calls `scripts/check-tokens.mjs`) to scan `badgey-homepage/index.html` plus the frontend codebase.
+- Guard failures indicate hex/rgb/hsla literals, `bg-black/NN`/`bg-white/NN`, arbitrary utilities with literal colors, or inline `hsl(var(--token)/NN)` usage. Replace them with the semantic or alpha tokens defined at the top of `index.html`.
+- In CI add `npm run tokens:check` before deployment (`npm run tokens:check && npm run deploy`) so marketing stays aligned with the application palette.
