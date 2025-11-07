@@ -6,6 +6,61 @@
   <title>Badgey</title>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
   <style>
+    :root {
+      /* Base HSL color pairs */
+      --licorice-hsl: 25 26% 7%;
+      --licorice-2-hsl: 24 24% 10%;
+      --coyote-hsl: 31 26% 44%;
+      --khaki-hsl: 36 35% 67%;
+      --dutch-white-hsl: 38 58% 86%;
+      --lapis-lazuli-hsl: 196 71% 30%;
+      --dark-goldenrod-hsl: 43 72% 43%;
+      
+      /* Semantic tokens - Light mode */
+      --background: var(--dutch-white-hsl);
+      --foreground: var(--licorice-hsl);
+      --primary: var(--lapis-lazuli-hsl);
+      --primary-foreground: var(--dutch-white-hsl);
+      --accent: var(--khaki-hsl);
+      --accent-foreground: var(--licorice-hsl);
+      --muted: var(--coyote-hsl);
+      --muted-foreground: var(--coyote-hsl);
+      --card: 0 0% 100%;
+      --card-foreground: var(--licorice-hsl);
+      --border: var(--khaki-hsl);
+      
+      /* Alpha tokens for translucency */
+      --card-glass-α: 0 0% 100% / 0.82;
+      --card-glass-border-α: var(--khaki-hsl) / 0.45;
+      --shadow-base-α: var(--licorice-hsl) / 0.16;
+      --shadow-logo-α: var(--licorice-hsl) / 0.2;
+      --primary-radial-α: var(--lapis-lazuli-hsl) / 0.22;
+      --primary-shadow-α: var(--lapis-lazuli-hsl) / 0.28;
+      --primary-shadow-hover-α: 196 52% 23% / 0.3;
+      --border-footer-α: var(--khaki-hsl) / 0.4;
+    }
+    
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --background: var(--licorice-hsl);
+        --foreground: var(--dutch-white-hsl);
+        --card: var(--licorice-2-hsl);
+        --card-foreground: var(--dutch-white-hsl);
+        --muted-foreground: var(--khaki-hsl);
+        --border: var(--khaki-hsl);
+        
+        /* Alpha tokens adjusted for dark mode */
+        --card-glass-α: var(--licorice-2-hsl) / 0.85;
+        --card-glass-border-α: var(--khaki-hsl) / 0.35;
+        --shadow-base-α: 0 0% 0% / 0.4;
+        --shadow-logo-α: 0 0% 0% / 0.35;
+        --primary-radial-α: var(--lapis-lazuli-hsl) / 0.18;
+        --primary-shadow-α: var(--lapis-lazuli-hsl) / 0.35;
+        --primary-shadow-hover-α: 196 52% 23% / 0.4;
+        --border-footer-α: var(--khaki-hsl) / 0.3;
+      }
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -14,8 +69,8 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-      background: linear-gradient(135deg, #EADCB3 0%, #C1B399 55%, #EADCB3 100%);
-      color: #18110F;
+      background: linear-gradient(135deg, hsl(var(--dutch-white-hsl)) 0%, hsl(var(--khaki-hsl)) 55%, hsl(var(--dutch-white-hsl)) 100%);
+      color: hsl(var(--foreground));
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -25,51 +80,56 @@
       overflow: hidden;
     }
 
+    @media (prefers-color-scheme: dark) {
+      body {
+        background: linear-gradient(135deg, hsl(var(--licorice-hsl)) 0%, hsl(var(--licorice-2-hsl)) 55%, hsl(var(--licorice-hsl)) 100%);
+      }
+    }
+
     body::before {
       content: "";
       position: absolute;
       inset: -30%;
-      background: radial-gradient(circle at top right, rgba(22, 99, 132, 0.22), transparent 60%);
+      background: radial-gradient(circle at top right, hsl(var(--primary-radial-α)), transparent 60%);
       pointer-events: none;
       transform: rotate(-12deg);
     }
 
     main {
       position: relative;
-      background: rgba(255, 255, 255, 0.82);
+      background: hsl(var(--card-glass-α));
       max-width: 620px;
       width: 100%;
       padding: 72px 64px;
       border-radius: 28px;
-      border: 1px solid rgba(193, 179, 153, 0.45);
-      box-shadow: 0 40px 90px rgba(24, 17, 15, 0.16);
+      border: 1px solid hsl(var(--card-glass-border-α));
+      box-shadow: 0 40px 90px hsl(var(--shadow-base-α));
       display: grid;
       gap: 32px;
       text-align: center;
+      -webkit-backdrop-filter: blur(18px);
       backdrop-filter: blur(18px);
       isolation: isolate;
     }
-
-
 
     .logo {
       width: 160px;
       height: 160px;
       margin: 0 auto;
-      filter: drop-shadow(0 16px 40px rgba(24, 17, 15, 0.2));
+      filter: drop-shadow(0 16px 40px hsl(var(--shadow-logo-α)));
     }
 
     h1 {
       font-size: 3.25rem;
       font-weight: 700;
       letter-spacing: -0.03em;
-      color: #B88622;
+      color: hsl(var(--dark-goldenrod-hsl));
       line-height: 1.05;
     }
 
     .tagline {
       font-size: 1.125rem;
-      color: #76542A;
+      color: hsl(var(--muted-foreground));
       line-height: 1.6;
     }
 
@@ -78,28 +138,28 @@
       align-items: center;
       justify-content: center;
       text-decoration: none;
-      color: #EADCB3;
-      background: #166384;
+      color: hsl(var(--primary-foreground));
+      background: hsl(var(--primary));
       padding: 18px 56px;
       border-radius: 999px;
       font-weight: 600;
       font-size: 1.05rem;
       transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
       border: none;
-      box-shadow: 0 16px 34px rgba(22, 99, 132, 0.28);
+      box-shadow: 0 16px 34px hsl(var(--primary-shadow-α));
     }
 
     .cta:hover {
-      background: #17383E;
+      background: hsl(196 52% 23%);
       transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 24px 48px rgba(22, 56, 62, 0.3);
+      box-shadow: 0 24px 48px hsl(var(--primary-shadow-hover-α));
     }
 
     footer {
       font-size: 0.95rem;
-      color: #76542A;
+      color: hsl(var(--muted-foreground));
       padding-top: 20px;
-      border-top: 1px solid rgba(193, 179, 153, 0.4);
+      border-top: 1px solid hsl(var(--border-footer-α));
     }
 
     @media (max-width: 640px) {
