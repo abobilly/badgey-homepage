@@ -7,57 +7,52 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2" />
   <style>
     :root {
-      /* Base HSL color pairs */
-      --licorice-hsl: 25 26% 7%;
-      --licorice-2-hsl: 24 24% 10%;
-      --coyote-hsl: 31 26% 44%;
-      --khaki-hsl: 36 35% 67%;
-      --dutch-white-hsl: 38 58% 86%;
-      --lapis-lazuli-hsl: 196 71% 30%;
-      --dark-goldenrod-hsl: 43 72% 43%;
-      
-      /* Semantic tokens - Light mode */
-      --background: var(--dutch-white-hsl);
-      --foreground: var(--licorice-hsl);
-      --primary: var(--lapis-lazuli-hsl);
-      --primary-foreground: var(--dutch-white-hsl);
-      --accent: var(--khaki-hsl);
-      --accent-foreground: var(--licorice-hsl);
-      --muted: var(--coyote-hsl);
-      --muted-foreground: var(--coyote-hsl);
-      --card: 0 0% 100%;
-      --card-foreground: var(--licorice-hsl);
-      --border: var(--khaki-hsl);
-      
-      /* Alpha tokens for translucency */
-      --card-glass-α: 0 0% 100% / 0.82;
-      --card-glass-border-α: var(--khaki-hsl) / 0.45;
-      --shadow-base-α: var(--licorice-hsl) / 0.16;
-      --shadow-logo-α: var(--licorice-hsl) / 0.2;
-      --primary-radial-α: var(--lapis-lazuli-hsl) / 0.22;
-      --primary-shadow-α: var(--lapis-lazuli-hsl) / 0.28;
-      --primary-shadow-hover-α: 196 52% 23% / 0.3;
-      --border-footer-α: var(--khaki-hsl) / 0.4;
+      --background: 0 0% 100%;
+      --foreground: 212 25% 12%;
+      --card: 210 26% 97%;
+      --card-foreground: var(--foreground);
+      --primary: 248 60% 18%;
+      --primary-foreground: 248 60% 82%;
+      --accent: 43 69% 65%;
+      --accent-foreground: 0 100% 13%;
+      --muted: 210 26% 95%;
+      --muted-foreground: 212 20% 40%;
+      --border: 210 20% 85%;
+      --sidebar-active-bg: 248 60% 82% / 0.18;
+      --sidebar-quiet-bg: 248 60% 82% / 0.08;
+      --overlay-surface: 212 25% 12% / 0.05;
+      --overlay-surface-strong: 212 25% 12% / 0.15;
+      --overlay-backdrop: 0 0% 0% / 0.5;
+      --card-glass-bg: 0 0% 100% / 0.82;
+      --card-glass-border: 210 20% 85% / 0.45;
+      --shadow-base-α: 212 25% 12% / 0.16;
+      --shadow-logo-α: 212 25% 12% / 0.2;
+      --primary-shadow-α: 248 60% 18% / 0.28;
+      --primary-shadow-hover-α: 248 60% 18% / 0.35;
+      --border-footer-α: 210 20% 85% / 0.4;
     }
     
     @media (prefers-color-scheme: dark) {
       :root {
-        --background: var(--licorice-hsl);
-        --foreground: var(--dutch-white-hsl);
-        --card: var(--licorice-2-hsl);
-        --card-foreground: var(--dutch-white-hsl);
-        --muted-foreground: var(--khaki-hsl);
-        --border: var(--khaki-hsl);
-        
-        /* Alpha tokens adjusted for dark mode */
-        --card-glass-α: var(--licorice-2-hsl) / 0.85;
-        --card-glass-border-α: var(--khaki-hsl) / 0.35;
+        --background: 212 25% 12%;
+        --foreground: 210 26% 87%;
+        --card: 212 25% 15%;
+        --card-foreground: var(--foreground);
+        --muted: 212 20% 20%;
+        --muted-foreground: 210 26% 70%;
+        --border: 212 20% 25%;
+        --sidebar-active-bg: 248 60% 82% / 0.22;
+        --sidebar-quiet-bg: 248 60% 82% / 0.08;
+        --overlay-surface: 210 26% 87% / 0.08;
+        --overlay-surface-strong: 210 26% 87% / 0.18;
+        --overlay-backdrop: 0 0% 0% / 0.7;
+        --card-glass-bg: 212 25% 15% / 0.85;
+        --card-glass-border: 212 20% 30% / 0.5;
         --shadow-base-α: 0 0% 0% / 0.4;
         --shadow-logo-α: 0 0% 0% / 0.35;
-        --primary-radial-α: var(--lapis-lazuli-hsl) / 0.18;
-        --primary-shadow-α: var(--lapis-lazuli-hsl) / 0.35;
-        --primary-shadow-hover-α: 196 52% 23% / 0.4;
-        --border-footer-α: var(--khaki-hsl) / 0.3;
+        --primary-shadow-α: 248 60% 82% / 0.35;
+        --primary-shadow-hover-α: 248 60% 82% / 0.45;
+        --border-footer-α: 212 20% 30% / 0.3;
       }
     }
 
@@ -69,7 +64,7 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-      background: linear-gradient(135deg, hsl(var(--dutch-white-hsl)) 0%, hsl(var(--khaki-hsl)) 55%, hsl(var(--dutch-white-hsl)) 100%);
+      background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--accent)) 55%, hsl(var(--background)) 100%);
       color: hsl(var(--foreground));
       min-height: 100vh;
       display: flex;
@@ -82,7 +77,7 @@
 
     @media (prefers-color-scheme: dark) {
       body {
-        background: linear-gradient(135deg, hsl(var(--licorice-hsl)) 0%, hsl(var(--licorice-2-hsl)) 55%, hsl(var(--licorice-hsl)) 100%);
+        background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--card)) 55%, hsl(var(--background)) 100%);
       }
     }
 
@@ -90,19 +85,19 @@
       content: "";
       position: absolute;
       inset: -30%;
-      background: radial-gradient(circle at top right, hsl(var(--primary-radial-α)), transparent 60%);
+      background: radial-gradient(circle at top right, hsl(var(--sidebar-active-bg)), transparent 60%);
       pointer-events: none;
       transform: rotate(-12deg);
     }
 
     main {
       position: relative;
-      background: hsl(var(--card-glass-α));
+      background: hsl(var(--card-glass-bg));
       max-width: 620px;
       width: 100%;
       padding: 72px 64px;
       border-radius: 28px;
-      border: 1px solid hsl(var(--card-glass-border-α));
+      border: 1px solid hsl(var(--card-glass-border));
       box-shadow: 0 40px 90px hsl(var(--shadow-base-α));
       display: grid;
       gap: 32px;
@@ -123,7 +118,7 @@
       font-size: 3.25rem;
       font-weight: 700;
       letter-spacing: -0.03em;
-      color: hsl(var(--dark-goldenrod-hsl));
+      color: hsl(var(--accent));
       line-height: 1.05;
     }
 
@@ -150,7 +145,7 @@
     }
 
     .cta:hover {
-      background: hsl(196 52% 23%);
+      background: hsl(var(--sidebar-active-bg));
       transform: translateY(-2px) scale(1.02);
       box-shadow: 0 24px 48px hsl(var(--primary-shadow-hover-α));
     }
