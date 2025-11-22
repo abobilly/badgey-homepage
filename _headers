@@ -1,0 +1,14 @@
+/flashcards/assets/*.js
+  Content-Type: application/javascript
+  
+/flashcards/assets/*.css
+  Content-Type: text/css
+  
+/flashcards/*.html
+  Content-Type: text/html
+  
+/data/*.json
+  Content-Type: application/json
+  
+/flashcards/data/*.json
+  Content-Type: application/json
