@@ -1,3 +1,7 @@
-# Flashcards SPA routing - serve index.html for all flashcards routes
-/flashcards /flashcards/ 301
-/flashcards/* /flashcards/:splat 200
+# Don't redirect static assets - serve them directly
+/flashcards/assets/* /flashcards/assets/:splat 200
+/flashcards/data/* /flashcards/data/:splat 200
+
+# Flashcards SPA routing - serve index.html for all other flashcard routes
+/flashcards /flashcards/index.html 200
+/flashcards/* /flashcards/index.html 200

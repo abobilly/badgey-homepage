@@ -1,8 +1,8 @@
 {
-  "routes": [
-    {
-      "include": ["/flashcards", "/flashcards/*"],
-      "target": "/flashcards/index.html"
-    }
+  "version": 1,
+  "include": ["/*"],
+  "exclude": [
+    "/flashcards/assets/*",
+    "/flashcards/data/*"
   ]
 }
