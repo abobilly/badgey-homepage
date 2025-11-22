@@ -134,6 +134,13 @@
       line-height: 1.6;
     }
 
+    .cta-group {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+    }
+
     .cta {
       display: inline-flex;
       align-items: center;
@@ -154,6 +161,11 @@
       background: hsl(var(--sidebar-active-bg));
       transform: translateY(-2px) scale(1.02);
       box-shadow: 0 24px 48px hsl(var(--primary-shadow-hover-α));
+    }
+
+    .cta-secondary {
+      background: hsl(var(--secondary));
+      color: hsl(var(--secondary-foreground));
     }
 
     footer {
@@ -194,7 +206,10 @@
     <p class="tagline">
       The badge for operators who keep Gmail, Calendar, Tasks, and Drive in perfect sync.
     </p>
-    <a href="https://app.badgey.org" class="cta">Launch App</a>
+    <div class="cta-group">
+      <a href="https://app.badgey.org" class="cta">Launch App</a>
+      <a href="/flashcards" class="cta cta-secondary">Bar Exam Flashcards</a>
+    </div>
     <footer>
       Built for one operator. Keep your Google login safe.
     </footer>
