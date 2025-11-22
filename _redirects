@@ -1,7 +1,3 @@
-# Don't redirect static assets - serve them directly
-/flashcards/assets/* /flashcards/assets/:splat 200
-/flashcards/data/* /flashcards/data/:splat 200
-
-# Flashcards SPA routing - serve index.html for all other flashcard routes
-/flashcards /flashcards/index.html 200
-/flashcards/* /flashcards/index.html 200
+# Redirect flashcards to the frontend app
+/flashcards https://app.badgey.org/flashcards 301
+/flashcards/* https://app.badgey.org/flashcards/:splat 301
