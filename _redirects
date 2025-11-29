@@ -1,3 +1,0 @@
-# Redirect flashcards to the frontend app
-/flashcards https://app.badgey.org/flashcards 301
-/flashcards/* https://app.badgey.org/flashcards/:splat 301
