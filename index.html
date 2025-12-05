@@ -4,61 +4,70 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Badgey</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <style>
     :root {
-      --background: 0 0% 100%;
-      --foreground: 25 26% 7%;
-      --card: 348 24% 85%;
-      --card-foreground: 348 24% 15%;
-      --primary: 248 60% 18%;
-      --primary-foreground: 248 60% 82%;
-      --secondary: 211 70% 16%;
-      --secondary-foreground: 211 70% 84%;
-      --accent: 43 69% 65%;
-      --accent-foreground: 0 100% 13%;
-      --muted: 25 26% 92%;
-      --muted-foreground: 25 20% 40%;
-      --border: 25 20% 80%;
-      --sidebar-active-bg: 248 60% 82% / 0.25;
-      --sidebar-quiet-bg: 248 60% 82% / 0.08;
-      --overlay-surface: 25 26% 7% / 0.05;
-      --overlay-surface-strong: 25 26% 7% / 0.15;
-      --overlay-backdrop: 0 0% 0% / 0.5;
-      --card-glass-bg: 0 0% 100% / 0.82;
-      --card-glass-border: 25 20% 80% / 0.45;
-      --shadow-base-α: 25 26% 7% / 0.16;
-      --shadow-logo-α: 25 26% 7% / 0.2;
-      --primary-shadow-α: 248 60% 18% / 0.28;
-      --primary-shadow-hover-α: 248 60% 18% / 0.35;
-      --border-footer-α: 25 20% 80% / 0.4;
+      /* === NEW BADGEY PALETTE === */
+      /* Accent (Primary Action) */
+      --accent-light: #ffe6ed;
+      --accent-main: #f84979;
+      --accent-dark: #d63c66;
+      --accent-darker: #b32d52;
+      
+      /* Neutrals */
+      --white: #ffffff;
+      --neutral-50: #fafafa;
+      --neutral-100: #f4f4f5;
+      --neutral-200: #e4e4e7;
+      --neutral-300: #d4d4d8;
+      --neutral-400: #a1a1aa;
+      --neutral-600: #696968;
+      --neutral-700: #52525b;
+      --neutral-800: #3e3e3e;
+      --black: #000000;
+      
+      /* Semantic */
+      --success: #16a34a;
+      --success-light: #dcfce7;
+      --warning: #d97706;
+      --warning-light: #fef3c7;
+      --error: #dc2626;
+      --error-light: #fee2e2;
+      
+      /* Mapped design tokens */
+      --background: var(--white);
+      --foreground: var(--neutral-800);
+      --card-bg: var(--white);
+      --card-border: var(--neutral-200);
+      --primary: var(--accent-main);
+      --primary-hover: var(--accent-dark);
+      --primary-active: var(--accent-darker);
+      --primary-foreground: var(--white);
+      --secondary-bg: var(--neutral-100);
+      --secondary-border: var(--neutral-300);
+      --muted: var(--neutral-600);
+      --muted-foreground: var(--neutral-600);
+      --text-primary: var(--neutral-800);
+      --text-secondary: var(--neutral-600);
+      --border: var(--neutral-200);
+      --shadow-color: rgba(0, 0, 0, 0.12);
+      --shadow-strong: rgba(0, 0, 0, 0.18);
     }
     
     @media (prefers-color-scheme: dark) {
       :root {
-        --background: 25 26% 7%;
-        --foreground: 25 26% 92%;
-        --card: 348 24% 15%;
-        --card-foreground: 348 24% 85%;
-        --primary: 248 60% 82%;
-        --primary-foreground: 248 60% 18%;
-        --secondary: 211 70% 84%;
-        --secondary-foreground: 211 70% 16%;
-        --muted: 25 20% 18%;
-        --muted-foreground: 25 20% 65%;
-        --border: 25 20% 25%;
-        --sidebar-active-bg: 248 60% 82% / 0.28;
-        --sidebar-quiet-bg: 248 60% 82% / 0.08;
-        --overlay-surface: 25 26% 92% / 0.08;
-        --overlay-surface-strong: 25 26% 92% / 0.18;
-        --overlay-backdrop: 0 0% 0% / 0.7;
-        --card-glass-bg: 25 26% 10% / 0.85;
-        --card-glass-border: 25 20% 30% / 0.5;
-        --shadow-base-α: 0 0% 0% / 0.4;
-        --shadow-logo-α: 0 0% 0% / 0.35;
-        --primary-shadow-α: 248 60% 82% / 0.35;
-        --primary-shadow-hover-α: 248 60% 82% / 0.45;
-        --border-footer-α: 25 20% 30% / 0.3;
+        --background: var(--neutral-800);
+        --foreground: var(--neutral-100);
+        --card-bg: #2a2a2a;
+        --card-border: #404040;
+        --text-primary: var(--neutral-100);
+        --text-secondary: var(--neutral-400);
+        --border: #404040;
+        --secondary-bg: #333333;
+        --secondary-border: #505050;
+        --shadow-color: rgba(0, 0, 0, 0.4);
+        --shadow-strong: rgba(0, 0, 0, 0.5);
       }
     }
 
@@ -70,8 +79,8 @@
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-      background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--accent)) 55%, hsl(var(--background)) 100%);
-      color: hsl(var(--foreground));
+      background: var(--neutral-50);
+      color: var(--foreground);
       min-height: 100vh;
       display: flex;
       align-items: center;
@@ -83,7 +92,7 @@
 
     @media (prefers-color-scheme: dark) {
       body {
-        background: linear-gradient(135deg, hsl(var(--background)) 0%, hsl(var(--card)) 55%, hsl(var(--background)) 100%);
+        background: var(--background);
       }
     }
 
@@ -91,25 +100,30 @@
       content: "";
       position: absolute;
       inset: -30%;
-      background: radial-gradient(circle at top right, hsl(var(--sidebar-active-bg)), transparent 60%);
+      background: radial-gradient(circle at top right, var(--accent-light), transparent 60%);
       pointer-events: none;
       transform: rotate(-12deg);
+      opacity: 0.5;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body::before {
+        background: radial-gradient(circle at top right, rgba(248, 73, 121, 0.15), transparent 60%);
+      }
     }
 
     main {
       position: relative;
-      background: hsl(var(--card-glass-bg));
+      background: var(--card-bg);
       max-width: 620px;
       width: 100%;
       padding: 48px 64px;
       border-radius: 28px;
-      border: 1px solid hsl(var(--card-glass-border));
-      box-shadow: 0 40px 90px hsl(var(--shadow-base-α));
+      border: 1px solid var(--card-border);
+      box-shadow: 0 40px 90px var(--shadow-color);
       display: grid;
       gap: 24px;
       text-align: center;
-      -webkit-backdrop-filter: blur(18px);
-      backdrop-filter: blur(18px);
       isolation: isolate;
     }
 
@@ -117,20 +131,26 @@
       width: 120px;
       height: 120px;
       margin: 0 auto;
-      filter: drop-shadow(0 16px 40px hsl(var(--shadow-logo-α)));
+      filter: drop-shadow(0 16px 40px var(--shadow-strong));
     }
 
     h1 {
       font-size: 3.25rem;
       font-weight: 700;
       letter-spacing: -0.03em;
-      color: hsl(var(--accent));
+      color: var(--black);
       line-height: 1.05;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      h1 {
+        color: var(--white);
+      }
     }
 
     .tagline {
       font-size: 1.125rem;
-      color: hsl(var(--muted-foreground));
+      color: var(--text-secondary);
       line-height: 1.6;
     }
 
@@ -146,33 +166,50 @@
       align-items: center;
       justify-content: center;
       text-decoration: none;
-      color: hsl(var(--primary-foreground));
-      background: hsl(var(--primary));
+      color: var(--primary-foreground);
+      background: var(--primary);
       padding: 14px 48px;
       border-radius: 999px;
       font-weight: 600;
       font-size: 1rem;
       transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
       border: none;
-      box-shadow: 0 16px 34px hsl(var(--primary-shadow-α));
+      box-shadow: 0 8px 24px rgba(248, 73, 121, 0.3);
     }
 
     .cta:hover {
-      background: hsl(var(--sidebar-active-bg));
+      background: var(--primary-hover);
       transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 24px 48px hsl(var(--primary-shadow-hover-α));
+      box-shadow: 0 12px 32px rgba(248, 73, 121, 0.4);
+    }
+
+    .cta:active {
+      background: var(--primary-active);
     }
 
     .cta-secondary {
-      background: hsl(var(--secondary));
-      color: hsl(var(--secondary-foreground));
+      background: var(--secondary-bg);
+      color: var(--text-primary);
+      border: 1px solid var(--secondary-border);
+      box-shadow: 0 4px 12px var(--shadow-color);
+    }
+
+    .cta-secondary:hover {
+      background: var(--neutral-200);
+      box-shadow: 0 8px 20px var(--shadow-color);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .cta-secondary:hover {
+        background: #444444;
+      }
     }
 
     footer {
       font-size: 0.95rem;
-      color: hsl(var(--muted-foreground));
+      color: var(--text-secondary);
       padding-top: 20px;
-      border-top: 1px solid hsl(var(--border-footer-α));
+      border-top: 1px solid var(--border);
     }
 
     @media (max-width: 640px) {
@@ -201,7 +238,7 @@
 </head>
 <body>
   <main>
-    <img src="/badgeyorg-512x512-v2.png" alt="Badgey Logo" class="logo" />
+    <img src="/badgey-256x256.png" alt="Badgey Logo" class="logo" />
     <h1>Badgey</h1>
     <p class="tagline">
       Projects:
