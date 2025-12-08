@@ -205,6 +205,43 @@
       }
     }
 
+    /* Hidden links (password protected) */
+    .protected-links {
+      display: none;
+    }
+    
+    .protected-links.unlocked {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .unlock-btn {
+      background: var(--secondary-bg);
+      color: var(--text-secondary);
+      border: 1px dashed var(--secondary-border);
+      box-shadow: none;
+      font-size: 0.9rem;
+      padding: 10px 24px;
+      cursor: pointer;
+    }
+
+    .unlock-btn:hover {
+      background: var(--neutral-200);
+      box-shadow: none;
+      transform: none;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .unlock-btn:hover {
+        background: #444444;
+      }
+    }
+
+    .unlock-btn.unlocked {
+      display: none;
+    }
+
     footer {
       font-size: 0.95rem;
       color: var(--text-secondary);
@@ -245,15 +282,37 @@
     </p>
     <div class="cta-group">
       <a href="https://go.badgey.org" class="cta">go</a>
-      <a href="https://flashcards.badgey.org" class="cta cta-secondary">Bar Exam Flashcards</a>
-      <a href="https://app.badgey.org" class="cta cta-secondary">Gmail Tool</a>
-      <a href="https://piano.badgey.org" class="cta cta-secondary">Piano App</a>
-      <a href="https://conferences.badgey.org" class="cta cta-secondary">School Conferences Map</a>
-      <a href="https://lisa.badgey.org" class="cta cta-secondary">Lisa Bar Low</a>
+      <button class="cta cta-secondary unlock-btn" id="unlockBtn">more...</button>
+      <div class="protected-links" id="protectedLinks">
+        <a href="https://flashcards.badgey.org" class="cta cta-secondary">Bar Exam Flashcards</a>
+        <a href="https://app.badgey.org" class="cta cta-secondary">Gmail Tool</a>
+        <a href="https://piano.badgey.org" class="cta cta-secondary">Piano App</a>
+        <a href="https://conferences.badgey.org" class="cta cta-secondary">School Conferences Map</a>
+        <a href="https://lisa.badgey.org" class="cta cta-secondary">Lisa Bar Low</a>
+      </div>
     </div>
     <footer>
       Built for one operator. Keep your Google login safe.
     </footer>
   </main>
+  <script>
+    const unlockBtn = document.getElementById('unlockBtn');
+    const protectedLinks = document.getElementById('protectedLinks');
+    
+    // Check if already unlocked in session
+    if (sessionStorage.getItem('badgey-unlocked') === 'true') {
+      protectedLinks.classList.add('unlocked');
+      unlockBtn.classList.add('unlocked');
+    }
+    
+    unlockBtn.addEventListener('click', () => {
+      const password = prompt('Password:');
+      if (password === 'donut') {
+        protectedLinks.classList.add('unlocked');
+        unlockBtn.classList.add('unlocked');
+        sessionStorage.setItem('badgey-unlocked', 'true');
+      }
+    });
+  </script>
 </body>
 </html>
