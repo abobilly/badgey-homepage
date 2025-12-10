@@ -247,9 +247,23 @@
       color: var(--text-secondary);
       padding-top: 20px;
       border-top: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .footer-mascot {
+      width: 80px;
+      height: auto;
+      opacity: 0.85;
+      filter: drop-shadow(0 4px 8px var(--shadow-color));
     }
 
     @media (max-width: 640px) {
+      .footer-mascot {
+        width: 60px;
+      }
       body {
         padding: 24px;
       }
@@ -281,10 +295,11 @@
       Projects:
     </p>
     <div class="cta-group">
-      <a href="https://go.badgey.org" class="cta">go</a>
+      <a href="https://go.badgey.org" class="cta">Go</a>
+      <a href="https://flashcards.badgey.org" class="cta">Flashcards</a>
       <button class="cta cta-secondary unlock-btn" id="unlockBtn">more...</button>
       <div class="protected-links" id="protectedLinks">
-        <a href="https://flashcards.badgey.org" class="cta cta-secondary">Bar Exam Flashcards</a>
+        <a href="https://draw.badgey.org" class="cta cta-secondary">SVG Draw</a>
         <a href="https://app.badgey.org" class="cta cta-secondary">Gmail Tool</a>
         <a href="https://piano.badgey.org" class="cta cta-secondary">Piano App</a>
         <a href="https://conferences.badgey.org" class="cta cta-secondary">School Conferences Map</a>
@@ -292,7 +307,8 @@
       </div>
     </div>
     <footer>
-      Built for one operator. Keep your Google login safe.
+      <img src="/badger_on_computer.png" alt="Badger on Computer" class="footer-mascot" />
+      <p>Built for one operator. Keep your Google login safe.</p>
     </footer>
   </main>
   <script>
