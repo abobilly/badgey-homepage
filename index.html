@@ -167,6 +167,12 @@
       gap: 12px;
     }
 
+    .links-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
     .section-title {
       font-size: 0.875rem;
       font-weight: 600;
@@ -248,35 +254,55 @@
       }
 
       main {
-        padding: 40px 24px;
+        padding: 32px 20px;
         gap: 20px;
+        border-radius: 20px;
       }
 
       .logo {
-        width: 100px;
-        height: 100px;
+        width: 80px;
+        height: 80px;
       }
 
       h1 {
-        font-size: 2.25rem;
+        font-size: 2rem;
       }
 
       .tagline {
-        font-size: 1rem;
+        font-size: 0.95rem;
+      }
+
+      .links-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
       }
 
       .cta {
         width: 100%;
-        padding: 12px 32px;
-        font-size: 0.95rem;
+        padding: 12px 24px;
+        font-size: 0.9rem;
       }
 
       .cta-group {
-        gap: 20px;
+        gap: 16px;
       }
 
       .section-title {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
+      }
+
+      footer {
+        padding-top: 16px;
+      }
+
+      footer p {
+        font-size: 0.85rem;
+      }
+    }
+
+    @media (min-width: 641px) and (max-width: 900px) {
+      main {
+        padding: 40px 40px;
       }
     }
   </style>
@@ -291,18 +317,23 @@
     <div class="cta-group">
       <div class="project-section">
         <h2 class="section-title">Tools</h2>
-        <a href="https://go.badgey.org" class="cta">Go</a>
-        <a href="https://flashcards.badgey.org" class="cta cta-secondary">Flashcards</a>
-        <a href="https://draw.badgey.org" class="cta cta-secondary">SVG Draw</a>
-        <a href="https://app.badgey.org" class="cta cta-secondary">Gmail Tool</a>
-        <a href="https://piano.badgey.org" class="cta cta-secondary">Piano App</a>
-        <a href="https://conferences.badgey.org" class="cta cta-secondary">School Conferences Map</a>
-        <a href="https://lisa.badgey.org" class="cta cta-secondary">Lisa Bar Low</a>
-        <a href="https://settings.badgey.org" class="cta cta-secondary">Settings</a>
+        <div class="links-grid">
+          <a href="https://go.badgey.org" class="cta">Go</a>
+          <a href="https://flashcards.badgey.org" class="cta cta-secondary">Flashcards</a>
+          <a href="https://quest.badgey.org" class="cta cta-secondary">Quest</a>
+          <a href="https://draw.badgey.org" class="cta cta-secondary">SVG Draw</a>
+          <a href="https://app.badgey.org" class="cta cta-secondary">Gmail Tool</a>
+          <a href="https://piano.badgey.org" class="cta cta-secondary">Piano App</a>
+          <a href="https://conferences.badgey.org" class="cta cta-secondary">Conferences Map</a>
+          <a href="https://lisa.badgey.org" class="cta cta-secondary">Lisa Bar Low</a>
+          <a href="https://settings.badgey.org" class="cta cta-secondary">Settings</a>
+        </div>
       </div>
       <div class="project-section">
         <h2 class="section-title">Legal Citations</h2>
-        <a href="https://badgercite.com" class="cta cta-secondary">Badgercite</a>
+        <div class="links-grid">
+          <a href="https://badgercite.com" class="cta cta-secondary">Badgercite</a>
+        </div>
       </div>
     </div>
     <footer>
