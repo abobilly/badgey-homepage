@@ -278,6 +278,7 @@
     const IDLE_DRIFT_MAX_MS = 4000;    // Maximum time between idle gaze shifts
     const IDLE_DRIFT_RANGE = 2;        // Max grid cells from center for idle drift
     const WINCE_DURATION_MS = 500;     // How long wince state lasts
+    const SPRITESHEET_SCALE = 1.1;     // Scale factor for spritesheet frames to match OW size (1.0 = no scale)
 
     // --- SPRITESHEET CONSTANTS ---
     const SPRITE_COLS = 8;
@@ -422,14 +423,18 @@
         // Draw wince image
         ctx.drawImage(images.wince, 0, 0, displayWidth, displayHeight);
       } else if (images.spritesheet) {
-        // Draw eye-tracking frame from spritesheet
+        // Draw eye-tracking frame from spritesheet (scaled to match OW size)
         const { col, row } = getGridIndices(smoothedDx, smoothedDy);
         const sx = col * SPRITE_CELL_SIZE;
         const sy = row * SPRITE_CELL_SIZE;
+        const scaledW = displayWidth * SPRITESHEET_SCALE;
+        const scaledH = displayHeight * SPRITESHEET_SCALE;
+        const offsetX = (displayWidth - scaledW) / 2;
+        const offsetY = (displayHeight - scaledH) / 2;
         ctx.drawImage(
           images.spritesheet,
           sx, sy, SPRITE_CELL_SIZE, SPRITE_CELL_SIZE,
-          0, 0, displayWidth, displayHeight
+          offsetX, offsetY, scaledW, scaledH
         );
       } else if (images.idle) {
         // Fallback to idle image while spritesheet loads
