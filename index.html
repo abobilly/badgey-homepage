@@ -4,18 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Badgey</title>
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="icon" type="image/png" sizes="192x192" href="/spudz_free.png" />
+  <link rel="apple-touch-icon" href="/spudz_free.png" />
   <style>
     :root {
-      /* === NEW BADGEY PALETTE === */
-      /* Accent (Primary Action) */
-      --accent-light: #ffe6ed;
       --accent-main: #f84979;
       --accent-dark: #d63c66;
       --accent-darker: #b32d52;
-      
-      /* Neutrals */
       --white: #ffffff;
       --neutral-50: #fafafa;
       --neutral-100: #f4f4f5;
@@ -23,324 +18,257 @@
       --neutral-300: #d4d4d8;
       --neutral-400: #a1a1aa;
       --neutral-600: #696968;
-      --neutral-700: #52525b;
       --neutral-800: #3e3e3e;
       --black: #000000;
-      
-      /* Semantic */
-      --success: #16a34a;
-      --success-light: #dcfce7;
-      --warning: #d97706;
-      --warning-light: #fef3c7;
-      --error: #dc2626;
-      --error-light: #fee2e2;
-      
-      /* Mapped design tokens */
-      --background: var(--white);
-      --foreground: var(--neutral-800);
-      --card-bg: var(--white);
-      --card-border: var(--neutral-200);
+      --background: var(--neutral-50);
+      --text-primary: var(--neutral-800);
+      --text-secondary: var(--neutral-600);
       --primary: var(--accent-main);
       --primary-hover: var(--accent-dark);
-      --primary-active: var(--accent-darker);
       --primary-foreground: var(--white);
       --secondary-bg: var(--neutral-100);
       --secondary-border: var(--neutral-300);
-      --muted: var(--neutral-600);
-      --muted-foreground: var(--neutral-600);
-      --text-primary: var(--neutral-800);
-      --text-secondary: var(--neutral-600);
       --border: var(--neutral-200);
       --shadow-color: rgba(0, 0, 0, 0.12);
-      --shadow-strong: rgba(0, 0, 0, 0.18);
     }
     
     @media (prefers-color-scheme: dark) {
       :root {
         --background: var(--neutral-800);
-        --foreground: var(--neutral-100);
-        --card-bg: #2a2a2a;
-        --card-border: #404040;
         --text-primary: var(--neutral-100);
         --text-secondary: var(--neutral-400);
         --border: #404040;
         --secondary-bg: #333333;
         --secondary-border: #505050;
         --shadow-color: rgba(0, 0, 0, 0.4);
-        --shadow-strong: rgba(0, 0, 0, 0.5);
       }
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-      background: var(--neutral-50);
-      color: var(--foreground);
+      font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+      background: var(--background);
+      color: var(--text-primary);
       min-height: 100vh;
       display: flex;
-      align-items: center;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 1rem 1.5rem;
+      display: flex;
       justify-content: center;
-      padding: 32px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      body {
-        background: var(--background);
-      }
-    }
-
-    body::before {
-      content: "";
-      position: absolute;
-      inset: -30%;
-      background: radial-gradient(circle at top right, var(--accent-light), transparent 60%);
-      pointer-events: none;
-      transform: rotate(-12deg);
-      opacity: 0.5;
-    }
-
-    @media (prefers-color-scheme: dark) {
-      body::before {
-        background: radial-gradient(circle at top right, rgba(248, 73, 121, 0.15), transparent 60%);
-      }
     }
 
     main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      gap: 2.5rem;
+    }
+
+    .logo-container {
       position: relative;
-      background: var(--card-bg);
-      max-width: 620px;
-      width: 100%;
-      padding: 48px 64px;
-      border-radius: 28px;
-      border: 1px solid var(--card-border);
-      box-shadow: 0 40px 90px var(--shadow-color);
-      display: grid;
-      gap: 24px;
-      text-align: center;
-      isolation: isolate;
+      cursor: pointer;
+      -webkit-user-select: none;
+      user-select: none;
     }
 
     .logo {
-      width: 120px;
-      height: 120px;
-      margin: 0 auto;
-      filter: drop-shadow(0 16px 40px var(--shadow-strong));
+      width: 180px;
+      height: 180px;
+      transition: transform 0.1s ease;
     }
 
-    h1 {
-      font-size: 3.25rem;
+    .logo-container:active .logo {
+      transform: scale(0.95);
+    }
+
+    .ow-text {
+      position: absolute;
+      top: -10px;
+      right: -20px;
+      font-size: 1.5rem;
       font-weight: 700;
-      letter-spacing: -0.03em;
-      color: var(--black);
-      line-height: 1.05;
+      color: var(--accent-main);
+      opacity: 0;
+      transform: rotate(12deg);
+      pointer-events: none;
+      transition: opacity 0.1s ease;
     }
 
-    @media (prefers-color-scheme: dark) {
-      h1 {
-        color: var(--white);
-      }
+    .ow-text.show {
+      opacity: 1;
     }
 
-    .tagline {
-      font-size: 1.125rem;
-      color: var(--text-secondary);
-      line-height: 1.6;
-    }
-
-    .cta-group {
+    .buttons {
       display: flex;
-      flex-direction: column;
-      gap: 24px;
-      align-items: stretch;
+      gap: 1rem;
+      flex-wrap: wrap;
+      justify-content: center;
     }
 
-    .project-section {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .links-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-    }
-
-    .section-title {
-      font-size: 0.875rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-secondary);
-      text-align: left;
-      margin-bottom: 4px;
-    }
-
-    .cta {
+    .btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       text-decoration: none;
       color: var(--primary-foreground);
       background: var(--primary);
-      padding: 14px 48px;
+      padding: 0.875rem 2.5rem;
       border-radius: 999px;
       font-weight: 600;
       font-size: 1rem;
-      transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
-      border: none;
-      box-shadow: 0 8px 24px rgba(248, 73, 121, 0.3);
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+      box-shadow: 0 4px 16px rgba(248, 73, 121, 0.3);
     }
 
-    .cta:hover {
+    .btn:hover {
       background: var(--primary-hover);
-      transform: translateY(-2px) scale(1.02);
-      box-shadow: 0 12px 32px rgba(248, 73, 121, 0.4);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(248, 73, 121, 0.4);
     }
 
-    .cta:active {
-      background: var(--primary-active);
-    }
-
-    .cta-secondary {
+    .btn-secondary {
       background: var(--secondary-bg);
       color: var(--text-primary);
       border: 1px solid var(--secondary-border);
+      box-shadow: 0 2px 8px var(--shadow-color);
+    }
+
+    .btn-secondary:hover {
+      background: var(--neutral-200);
       box-shadow: 0 4px 12px var(--shadow-color);
     }
 
-    .cta-secondary:hover {
-      background: var(--neutral-200);
-      box-shadow: 0 8px 20px var(--shadow-color);
-    }
-
     @media (prefers-color-scheme: dark) {
-      .cta-secondary:hover {
+      .btn-secondary:hover {
         background: #444444;
       }
     }
 
     footer {
-      font-size: 0.95rem;
-      color: var(--text-secondary);
-      padding-top: 20px;
+      padding: 1.5rem;
+      text-align: center;
       border-top: 1px solid var(--border);
+    }
+
+    .other-toggle {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      cursor: pointer;
+      padding: 0.25rem 0.5rem;
+      opacity: 0.6;
+      transition: opacity 0.2s ease;
+    }
+
+    .other-toggle:hover {
+      opacity: 1;
+    }
+
+    .other-links {
+      display: none;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .other-links.show {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
     }
 
-    .footer-mascot {
-      width: 80px;
-      height: auto;
-      opacity: 0.85;
-      filter: drop-shadow(0 4px 8px var(--shadow-color));
+    .other-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      transition: color 0.2s ease, background 0.2s ease;
     }
 
-    @media (max-width: 640px) {
-      .footer-mascot {
-        width: 60px;
-      }
-      body {
-        padding: 16px;
-      }
+    .other-links a:hover {
+      color: var(--text-primary);
+      background: var(--secondary-bg);
+    }
 
-      main {
-        padding: 32px 20px;
-        gap: 20px;
-        border-radius: 20px;
-      }
-
+    @media (max-width: 480px) {
       .logo {
-        width: 80px;
-        height: 80px;
+        width: 140px;
+        height: 140px;
       }
 
-      h1 {
-        font-size: 2rem;
-      }
-
-      .tagline {
-        font-size: 0.95rem;
-      }
-
-      .links-grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
-      }
-
-      .cta {
+      .buttons {
+        flex-direction: column;
         width: 100%;
-        padding: 12px 24px;
-        font-size: 0.9rem;
+        max-width: 280px;
       }
 
-      .cta-group {
-        gap: 16px;
-      }
-
-      .section-title {
-        font-size: 0.75rem;
-      }
-
-      footer {
-        padding-top: 16px;
-      }
-
-      footer p {
-        font-size: 0.85rem;
-      }
-    }
-
-    @media (min-width: 641px) and (max-width: 900px) {
-      main {
-        padding: 40px 40px;
+      .btn {
+        width: 100%;
       }
     }
   </style>
 </head>
 <body>
+  <header></header>
+  
   <main>
-    <img src="/badgey-256x256.png" alt="Badgey Logo" class="logo" />
-    <h1>Badgey</h1>
-    <p class="tagline">
-      Projects Directory
-    </p>
-    <div class="cta-group">
-      <div class="project-section">
-        <h2 class="section-title">Tools</h2>
-        <div class="links-grid">
-          <a href="https://go.badgey.org" class="cta">Go</a>
-          <a href="https://flashcards.badgey.org" class="cta cta-secondary">Flashcards</a>
-          <a href="https://quest.badgey.org" class="cta cta-secondary">Quest</a>
-          <a href="https://sprite.badgey.org" class="cta cta-secondary">Sprite</a>
-          <a href="https://draw.badgey.org" class="cta cta-secondary">SVG Draw</a>
-          <a href="https://app.badgey.org" class="cta cta-secondary">Gmail Tool</a>
-          <a href="https://piano.badgey.org" class="cta cta-secondary">Piano App</a>
-          <a href="https://conferences.badgey.org" class="cta cta-secondary">Conferences Map</a>
-          <a href="https://lisa.badgey.org" class="cta cta-secondary">Lisa Bar Low</a>
-          <a href="https://settings.badgey.org" class="cta cta-secondary">Settings</a>
-        </div>
-      </div>
-      <div class="project-section">
-        <h2 class="section-title">Legal Citations</h2>
-        <div class="links-grid">
-          <a href="https://badgercite.com" class="cta cta-secondary">Badgercite</a>
-        </div>
-      </div>
+    <div class="logo-container" id="logoContainer">
+      <img src="/spudz_free.png" alt="Badgey" class="logo" id="logo" />
+      <span class="ow-text" id="owText">OW!</span>
     </div>
-    <footer>
-      <p>Built for one operator. Keep your Google login safe.</p>
-    </footer>
+
+    <div class="buttons">
+      <a href="https://go.badgey.org" class="btn">Go</a>
+      <a href="https://flashcards.badgey.org" class="btn btn-secondary">Flashcards</a>
+    </div>
   </main>
 
+  <footer>
+    <button class="other-toggle" id="otherToggle">other</button>
+    <div class="other-links" id="otherLinks">
+      <a href="https://quest.badgey.org">Quest</a>
+      <a href="https://sprite.badgey.org">Sprite</a>
+      <a href="https://draw.badgey.org">SVG Draw</a>
+      <a href="https://app.badgey.org">Gmail Tool</a>
+      <a href="https://piano.badgey.org">Piano</a>
+      <a href="https://conferences.badgey.org">Conferences</a>
+      <a href="https://lisa.badgey.org">Lisa Bar Low</a>
+      <a href="https://settings.badgey.org">Settings</a>
+      <a href="https://badgercite.com">Badgercite</a>
+    </div>
+  </footer>
+
+  <script>
+    const logo = document.getElementById('logo');
+    const owText = document.getElementById('owText');
+    const logoContainer = document.getElementById('logoContainer');
+    const otherToggle = document.getElementById('otherToggle');
+    const otherLinks = document.getElementById('otherLinks');
+
+    logoContainer.addEventListener('click', () => {
+      logo.src = '/spuds_free_OW.png';
+      owText.classList.add('show');
+      
+      setTimeout(() => {
+        logo.src = '/spudz_free.png';
+        owText.classList.remove('show');
+      }, 500);
+    });
+
+    otherToggle.addEventListener('click', () => {
+      otherLinks.classList.toggle('show');
+      otherToggle.textContent = otherLinks.classList.contains('show') ? 'hide' : 'other';
+    });
+  </script>
 </body>
 </html>
