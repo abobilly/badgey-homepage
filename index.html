@@ -53,6 +53,59 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Parallax Background Layers */
+    .parallax-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -10;
+      overflow: hidden;
+    }
+
+    .bg-layer {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .bg-layer-1 {
+      background-image: url('bg/background1.png');
+      z-index: 1;
+    }
+
+    .bg-layer-2 {
+      background-image: url('bg/background2.png');
+      z-index: 2;
+    }
+
+    .bg-layer-3 {
+      background-image: url('bg/background3.png');
+      z-index: 3;
+    }
+
+    /* Floating Clouds */
+    .clouds-container {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    .cloud {
+      position: absolute;
+      background-size: contain;
+      background-repeat: no-repeat;
+      opacity: 0.8;
+      will-change: transform;
+    }
+
+    @keyframes drift-slow {
+      0% { transform: translateX(-20%); }
+      100% { transform: translateX(120vw); }
     }
 
     header {
@@ -228,6 +281,14 @@
   </style>
 </head>
 <body>
+  <!-- Parallax Background -->
+  <div class="parallax-bg">
+    <div class="bg-layer bg-layer-1"></div>
+    <div class="bg-layer bg-layer-2"></div>
+    <div class="bg-layer bg-layer-3"></div>
+    <div class="clouds-container" id="cloudsContainer"></div>
+  </div>
+
   <header></header>
   
   <main>
@@ -486,6 +547,50 @@
       otherLinks.classList.toggle('show');
       otherToggle.textContent = otherLinks.classList.contains('show') ? 'hide' : 'other';
     });
+
+    // --- FLOATING CLOUDS ---
+    (function initClouds() {
+      const container = document.getElementById('cloudsContainer');
+      if (!container) return;
+
+      const cloudImages = [
+        'bg/cloud1.png', 'bg/cloud2.png', 'bg/cloud3.png', 'bg/cloud4.png',
+        'bg/cloud5.png', 'bg/cloud6.png', 'bg/cloud7.png', 'bg/cloud8.png'
+      ];
+
+      // Spawn 6-8 clouds at various positions
+      const cloudCount = 6 + Math.floor(Math.random() * 3);
+      
+      for (let i = 0; i < cloudCount; i++) {
+        const cloud = document.createElement('div');
+        cloud.className = 'cloud';
+        
+        // Random cloud image
+        const imgSrc = cloudImages[Math.floor(Math.random() * cloudImages.length)];
+        cloud.style.backgroundImage = `url('${imgSrc}')`;
+        
+        // Random size (80-200px width)
+        const size = 80 + Math.random() * 120;
+        cloud.style.width = `${size}px`;
+        cloud.style.height = `${size * 0.6}px`;
+        
+        // Random vertical position (top 60% of screen)
+        cloud.style.top = `${Math.random() * 50}%`;
+        
+        // Random starting horizontal position
+        cloud.style.left = `${-10 + Math.random() * 100}%`;
+        
+        // Gentle drift animation (60-120 seconds per cycle)
+        const duration = 60 + Math.random() * 60;
+        const delay = Math.random() * -duration; // Stagger start times
+        const direction = Math.random() > 0.5 ? 'normal' : 'reverse';
+        
+        cloud.style.animation = `drift-slow ${duration}s linear ${delay}s infinite ${direction}`;
+        cloud.style.opacity = 0.5 + Math.random() * 0.4;
+        
+        container.appendChild(cloud);
+      }
+    })();
   </script>
 </body>
 </html>
