@@ -262,7 +262,7 @@
     // =============================================================================
     // SPUDZ EYE-TRACKING SYSTEM
     // =============================================================================
-    // Spritesheet: spudz_eyez.png (1024×1280, 8 cols × 10 rows, 128×128 per cell)
+    // Spritesheet: spudz_eyez_4096x5120.png (4096×5120, 8 cols × 10 rows, 512×512 per cell)
     //   - Columns (0-7): horizontal gaze direction (left → right)
     //   - Rows (0-9): vertical gaze direction (up → down)
     //   - Center gaze: approximately col=3-4, row=4-5
@@ -282,7 +282,7 @@
     // --- SPRITESHEET CONSTANTS ---
     const SPRITE_COLS = 8;
     const SPRITE_ROWS = 10;
-    const SPRITE_CELL_SIZE = 128;
+    const SPRITE_CELL_SIZE = 512;  // 512x512 cells in 4096x5120 sheet
     const CENTER_COL = 3.5;  // Center of horizontal gaze
     const CENTER_ROW = 4.5;  // Center of vertical gaze
 
@@ -315,7 +315,7 @@
 
     function preloadImages() {
       const srcs = {
-        spritesheet: '/spudz_eyez.png',
+        spritesheet: '/spudz_eyez_4096x5120.png',
         idle: '/spudz_free.png',
         wince: '/spudz_free_OW.png'
       };
