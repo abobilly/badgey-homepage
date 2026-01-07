@@ -84,7 +84,15 @@
       transition: transform 0.1s ease;
     }
 
-    .logo-container:active .logo {
+    /* Canvas replaces img for eye-tracking; same sizing */
+    #spudzCanvas {
+      width: 180px;
+      height: 180px;
+      transition: transform 0.1s ease;
+    }
+
+    .logo-container:active .logo,
+    .logo-container:active #spudzCanvas {
       transform: scale(0.95);
     }
 
@@ -201,7 +209,8 @@
     }
 
     @media (max-width: 480px) {
-      .logo {
+      .logo,
+      #spudzCanvas {
         width: 140px;
         height: 140px;
       }
@@ -223,7 +232,8 @@
   
   <main>
     <div class="logo-container" id="logoContainer">
-      <img src="/spudz_free.png" alt="Badgey" class="logo" id="logo" />
+      <!-- Canvas for eye-tracking spritesheet rendering; replaces static img -->
+      <canvas id="spudzCanvas" width="180" height="180" aria-label="Badgey" role="img"></canvas>
       <span class="ow-text" id="owText">OW!</span>
     </div>
 
@@ -249,22 +259,224 @@
   </footer>
 
   <script>
-    const logo = document.getElementById('logo');
+    // =============================================================================
+    // SPUDZ EYE-TRACKING SYSTEM
+    // =============================================================================
+    // Spritesheet: spudz_eyez.png (1024×1280, 8 cols × 10 rows, 128×128 per cell)
+    //   - Columns (0-7): horizontal gaze direction (left → right)
+    //   - Rows (0-9): vertical gaze direction (up → down)
+    //   - Center gaze: approximately col=3-4, row=4-5
+    //
+    // Tunable constants below for range, smoothing, and idle drift behavior.
+    // Wince state overrides idle-follow: on click, show OW image for 500ms.
+    // =============================================================================
+
+    // --- TUNABLE CONSTANTS ---
+    const RANGE_PX = 250;              // Pixel distance to normalize cursor offset to [-1, 1]
+    const SMOOTHING_ALPHA = 0.15;      // Lerp speed for eye movement (0-1, higher = faster)
+    const IDLE_DRIFT_MIN_MS = 2000;    // Minimum time between idle gaze shifts
+    const IDLE_DRIFT_MAX_MS = 4000;    // Maximum time between idle gaze shifts
+    const IDLE_DRIFT_RANGE = 2;        // Max grid cells from center for idle drift
+    const WINCE_DURATION_MS = 500;     // How long wince state lasts
+
+    // --- SPRITESHEET CONSTANTS ---
+    const SPRITE_COLS = 8;
+    const SPRITE_ROWS = 10;
+    const SPRITE_CELL_SIZE = 128;
+    const CENTER_COL = 3.5;  // Center of horizontal gaze
+    const CENTER_ROW = 4.5;  // Center of vertical gaze
+
+    // --- DOM ELEMENTS ---
+    const canvas = document.getElementById('spudzCanvas');
+    const ctx = canvas.getContext('2d');
     const owText = document.getElementById('owText');
     const logoContainer = document.getElementById('logoContainer');
     const otherToggle = document.getElementById('otherToggle');
     const otherLinks = document.getElementById('otherLinks');
 
+    // --- STATE ---
+    let state = 'idle_follow';  // 'idle_follow' | 'wince'
+    let smoothedDx = 0;         // Smoothed normalized X offset [-1, 1]
+    let smoothedDy = 0;         // Smoothed normalized Y offset [-1, 1]
+    let targetDx = 0;           // Target X (from mouse or idle drift)
+    let targetDy = 0;           // Target Y (from mouse or idle drift)
+    let hasMouseActivity = false;  // True if mouse is actively tracking
+    let idleDriftTimeout = null;
+    let winceTimeout = null;
+
+    // --- IMAGE PRELOADING ---
+    const images = {
+      spritesheet: null,
+      idle: null,
+      wince: null
+    };
+    let imagesLoaded = 0;
+    const TOTAL_IMAGES = 3;
+
+    function preloadImages() {
+      const srcs = {
+        spritesheet: '/spudz_eyez.png',
+        idle: '/spudz_free.png',
+        wince: '/spudz_free_OW.png'
+      };
+      for (const [key, src] of Object.entries(srcs)) {
+        const img = new Image();
+        img.onload = () => {
+          images[key] = img;
+          imagesLoaded++;
+          if (imagesLoaded === TOTAL_IMAGES) {
+            startAnimationLoop();
+          }
+        };
+        img.src = src;
+      }
+    }
+
+    // --- CANVAS SIZING (DPR-aware) ---
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.scale(dpr, dpr);
+    }
+
+    // --- GRID INDEX CALCULATION ---
+    function clamp(val, min, max) {
+      return Math.max(min, Math.min(max, val));
+    }
+
+    function getGridIndices(dx, dy) {
+      // dx, dy are normalized to [-1, 1]
+      // Convert to grid indices
+      const col = Math.round(((dx + 1) / 2) * (SPRITE_COLS - 1));
+      const row = Math.round(((dy + 1) / 2) * (SPRITE_ROWS - 1));
+      return {
+        col: clamp(col, 0, SPRITE_COLS - 1),
+        row: clamp(row, 0, SPRITE_ROWS - 1)
+      };
+    }
+
+    // --- IDLE DRIFT (when no mouse activity) ---
+    function scheduleIdleDrift() {
+      if (idleDriftTimeout) clearTimeout(idleDriftTimeout);
+      const delay = IDLE_DRIFT_MIN_MS + Math.random() * (IDLE_DRIFT_MAX_MS - IDLE_DRIFT_MIN_MS);
+      idleDriftTimeout = setTimeout(() => {
+        if (!hasMouseActivity && state === 'idle_follow') {
+          // Pick a random offset near center
+          const offsetCol = (Math.random() - 0.5) * 2 * IDLE_DRIFT_RANGE;
+          const offsetRow = (Math.random() - 0.5) * 2 * IDLE_DRIFT_RANGE;
+          // Convert to normalized [-1, 1] space
+          targetDx = offsetCol / (SPRITE_COLS / 2);
+          targetDy = offsetRow / (SPRITE_ROWS / 2);
+          targetDx = clamp(targetDx, -0.4, 0.4);  // Keep near center
+          targetDy = clamp(targetDy, -0.4, 0.4);
+        }
+        scheduleIdleDrift();
+      }, delay);
+    }
+
+    function resetToCenter() {
+      targetDx = 0;
+      targetDy = 0;
+    }
+
+    // --- MOUSE TRACKING ---
+    let mouseActivityTimeout = null;
+
+    function handleMouseMove(e) {
+      if (state !== 'idle_follow') return;
+
+      hasMouseActivity = true;
+      if (mouseActivityTimeout) clearTimeout(mouseActivityTimeout);
+      mouseActivityTimeout = setTimeout(() => {
+        hasMouseActivity = false;
+        resetToCenter();
+      }, 3000);  // Consider mouse inactive after 3s of no movement
+
+      const rect = canvas.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+
+      const dx = e.clientX - centerX;
+      const dy = e.clientY - centerY;
+
+      // Normalize to [-1, 1] based on RANGE_PX
+      targetDx = clamp(dx / RANGE_PX, -1, 1);
+      targetDy = clamp(dy / RANGE_PX, -1, 1);
+    }
+
+    function handleMouseLeave() {
+      hasMouseActivity = false;
+      resetToCenter();
+    }
+
+    // --- RENDERING ---
+    function render() {
+      const displayWidth = canvas.getBoundingClientRect().width;
+      const displayHeight = canvas.getBoundingClientRect().height;
+
+      ctx.clearRect(0, 0, displayWidth, displayHeight);
+
+      if (state === 'wince' && images.wince) {
+        // Draw wince image
+        ctx.drawImage(images.wince, 0, 0, displayWidth, displayHeight);
+      } else if (images.spritesheet) {
+        // Draw eye-tracking frame from spritesheet
+        const { col, row } = getGridIndices(smoothedDx, smoothedDy);
+        const sx = col * SPRITE_CELL_SIZE;
+        const sy = row * SPRITE_CELL_SIZE;
+        ctx.drawImage(
+          images.spritesheet,
+          sx, sy, SPRITE_CELL_SIZE, SPRITE_CELL_SIZE,
+          0, 0, displayWidth, displayHeight
+        );
+      } else if (images.idle) {
+        // Fallback to idle image while spritesheet loads
+        ctx.drawImage(images.idle, 0, 0, displayWidth, displayHeight);
+      }
+    }
+
+    // --- ANIMATION LOOP ---
+    function animationLoop() {
+      // Smooth lerp toward target
+      smoothedDx += (targetDx - smoothedDx) * SMOOTHING_ALPHA;
+      smoothedDy += (targetDy - smoothedDy) * SMOOTHING_ALPHA;
+
+      render();
+      requestAnimationFrame(animationLoop);
+    }
+
+    function startAnimationLoop() {
+      resizeCanvas();
+      scheduleIdleDrift();
+      animationLoop();
+    }
+
+    // --- CLICK HANDLER (WINCE) ---
     logoContainer.addEventListener('click', () => {
-      logo.src = '/spudz_free_OW.png';
+      // Set state to wince, overriding eye tracking
+      state = 'wince';
       owText.classList.add('show');
-      
-      setTimeout(() => {
-        logo.src = '/spudz_free.png';
+
+      // Clear any pending wince timeout
+      if (winceTimeout) clearTimeout(winceTimeout);
+
+      winceTimeout = setTimeout(() => {
+        state = 'idle_follow';
         owText.classList.remove('show');
-      }, 500);
+      }, WINCE_DURATION_MS);
     });
 
+    // --- EVENT LISTENERS ---
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseleave', handleMouseLeave);
+    window.addEventListener('resize', resizeCanvas);
+
+    // --- INITIALIZATION ---
+    preloadImages();
+
+    // --- OTHER LINKS TOGGLE (existing functionality) ---
     otherToggle.addEventListener('click', () => {
       otherLinks.classList.toggle('show');
       otherToggle.textContent = otherLinks.classList.contains('show') ? 'hide' : 'other';
