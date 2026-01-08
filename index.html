@@ -621,8 +621,8 @@
         sheetRows: 5,
         displayScaleMin: 1.8,     // Random scale range
         displayScaleMax: 3.2,
-        maxFrogsDesktop: 10,      // Doubled from 5
-        maxFrogsMobile: 4,        // Doubled from 2
+        maxFrogsDesktop: 8,       // 25% fewer
+        maxFrogsMobile: 3,        // 25% fewer
         spawnIntervalMin: 10000,
         spawnIntervalMax: 20000,
         hopDuration: 800,
@@ -634,13 +634,13 @@
         // Levitation settings
         wobbleSpeed: 0.002,       // Radians per ms (slow, calm)
         wobbleAmplitude: 3,       // Pixels of wobble
-        glowRadius: 20,           // Glow blur radius
+        glowRadiusMin: 10,        // Min glow blur at midpoint
+        glowRadiusMax: 40,        // Max glow blur at top of screen
         glowColor: 'rgba(255, 255, 255, 0.4)',
         // Shadow settings
-        shadowOffsetY: 8,
-        shadowBlur: 6,
-        shadowColor: 'rgba(0, 0, 0, 0.25)',
-        // Collision settings
+        shadowOffsetY: 2,         // Subtle shadow right under frog
+        shadowColor: 'rgba(0, 0, 0, 0.15)',
+        // Hurt/click settings
         hurtDuration: 500
       };
 
@@ -761,35 +761,13 @@
         return centerY < window.innerHeight / 2;
       }
 
-      // --- COLLISION DETECTION ---
-      function checkCollisions() {
-        for (let i = 0; i < frogs.length; i++) {
-          for (let j = i + 1; j < frogs.length; j++) {
-            const a = frogs[i];
-            const b = frogs[j];
-            
-            // Skip if either is exploding or already hurt
-            if (a.state === 'exploding' || b.state === 'exploding') continue;
-            if (a.state === 'hurt' || b.state === 'hurt') continue;
-            
-            // Get bounding boxes
-            const aw = FROG_CONFIG.tileWidth * a.scale;
-            const ah = FROG_CONFIG.tileHeight * a.scale;
-            const bw = FROG_CONFIG.tileWidth * b.scale;
-            const bh = FROG_CONFIG.tileHeight * b.scale;
-            
-            // Simple AABB collision (with padding for less sensitive detection)
-            const padding = 10;
-            if (a.x + padding < b.x + bw - padding &&
-                a.x + aw - padding > b.x + padding &&
-                a.y + padding < b.y + bh - padding &&
-                a.y + ah - padding > b.y + padding) {
-              // Collision! Trigger hurt on both
-              a.triggerHurt();
-              b.triggerHurt();
-            }
-          }
-        }
+      // --- HELPER: Get levitation amount (0 at midpoint, 1 at top) ---
+      function getLevitationAmount(y, frogHeight) {
+        const centerY = y + frogHeight / 2;
+        const midpoint = window.innerHeight / 2;
+        if (centerY >= midpoint) return 0;
+        // How far above midpoint (0 to 1)
+        return Math.min(1, (midpoint - centerY) / midpoint);
       }
 
       // --- FROG CLASS ---
@@ -813,6 +791,8 @@
             Math.random() * (FROG_CONFIG.displayScaleMax - FROG_CONFIG.displayScaleMin);
           // Wobble phase offset (randomized so frogs don't wobble in sync)
           this.wobblePhase = Math.random() * Math.PI * 2;
+          // Click tracking: requires 2 clicks to explode
+          this.clickCount = 0;
           // Hurt state tracking
           this.hurtTimer = 0;
           this.scheduleNextHop();
@@ -872,12 +852,24 @@
         }
 
         triggerHurt() {
-          if (this.state === 'exploding' || this.state === 'hurt') return;
+          if (this.state === 'exploding') return;
           if (this.hopTimeout) clearTimeout(this.hopTimeout);
           this.state = 'hurt';
           this.frameIndex = 0;
           this.frameTimer = 0;
           this.hurtTimer = FROG_CONFIG.hurtDuration;
+        }
+
+        // Handle click - first click hurts, second click explodes
+        handleClick() {
+          if (this.state === 'exploding') return false;
+          this.clickCount++;
+          if (this.clickCount >= 2) {
+            this.explode();
+          } else {
+            this.triggerHurt();
+          }
+          return true;
         }
 
         explode() {
@@ -983,22 +975,25 @@
           // Draw shadow if on ground (bottom half) and not exploding
           if (!levitating && this.state !== 'exploding') {
             ctx.save();
-            ctx.globalAlpha = 0.25;
+            ctx.globalAlpha = 0.15;
             ctx.fillStyle = FROG_CONFIG.shadowColor;
-            // Elliptical shadow beneath frog
-            const shadowWidth = dw * 0.6;
-            const shadowHeight = dh * 0.2;
+            // Subtle elliptical shadow right beneath frog
+            const shadowWidth = dw * 0.5;
+            const shadowHeight = dh * 0.12;
             const shadowX = this.x + dw / 2;
-            const shadowY = this.y + dh + FROG_CONFIG.shadowOffsetY;
+            const shadowY = this.y + dh - FROG_CONFIG.shadowOffsetY;
             ctx.beginPath();
             ctx.ellipse(shadowX, shadowY, shadowWidth / 2, shadowHeight / 2, 0, 0, Math.PI * 2);
             ctx.fill();
             ctx.restore();
           }
           
-          // Apply glow effect for levitating frogs
+          // Apply glow effect for levitating frogs - intensity based on height
           if (levitating && this.state !== 'exploding') {
-            ctx.shadowBlur = FROG_CONFIG.glowRadius;
+            const levAmount = getLevitationAmount(this.y, frogHeight);
+            const glowRadius = FROG_CONFIG.glowRadiusMin + 
+              (FROG_CONFIG.glowRadiusMax - FROG_CONFIG.glowRadiusMin) * levAmount;
+            ctx.shadowBlur = glowRadius;
             ctx.shadowColor = FROG_CONFIG.glowColor;
           }
           
@@ -1101,19 +1096,34 @@
 
       // --- CLICK HANDLING ---
       function handleClick(e) {
-        // Canvas is fixed at 0,0, so clientX/clientY are the coordinates
         const x = e.clientX;
         const y = e.clientY;
         
         // Check frogs in reverse order (top-most first)
         for (let i = frogs.length - 1; i >= 0; i--) {
           if (frogs[i].containsPoint(x, y) && frogs[i].state !== 'exploding') {
-            frogs[i].explode();
+            frogs[i].handleClick();
             e.stopPropagation();
             e.preventDefault();
-            return;  // Only explode one frog per click
+            return;
           }
         }
+      }
+
+      // --- HOVER HANDLING (cursor change) ---
+      function handleMouseMove(e) {
+        const x = e.clientX;
+        const y = e.clientY;
+        
+        let overFrog = false;
+        for (let i = frogs.length - 1; i >= 0; i--) {
+          if (frogs[i].containsPoint(x, y) && frogs[i].state !== 'exploding') {
+            overFrog = true;
+            break;
+          }
+        }
+        
+        document.body.style.cursor = overFrog ? 'pointer' : '';
       }
 
       // --- RENDER LOOP ---
@@ -1124,9 +1134,6 @@
         globalTime = currentTime;  // Update global time for wobble
 
         frogCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-
-        // Check for collisions
-        checkCollisions();
 
         // Update and draw frogs
         for (let i = frogs.length - 1; i >= 0; i--) {
@@ -1147,6 +1154,8 @@
         window.addEventListener('resize', resizeFrogCanvas);
         // Use capture phase so frog clicks are detected before other handlers
         document.addEventListener('click', handleClick, true);
+        // Track mouse for cursor change
+        document.addEventListener('mousemove', handleMouseMove);
         
         preloadFrogSheets(() => {
           // Start spawning after a short initial delay
