@@ -278,6 +278,14 @@
         width: 100%;
       }
     }
+
+    /* Frog Canvas Layer */
+    #frogCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
@@ -288,6 +296,9 @@
     <div class="bg-layer bg-layer-3"></div>
     <div class="clouds-container" id="cloudsContainer"></div>
   </div>
+
+  <!-- Frog Animation Layer -->
+  <canvas id="frogCanvas"></canvas>
 
   <header></header>
   
@@ -590,6 +601,386 @@
         
         container.appendChild(cloud);
       }
+    })();
+
+    // =============================================================================
+    // TOXIC FROG ANIMATION SYSTEM
+    // =============================================================================
+    // Frogs spawn randomly at screen edges, hop around with parabolic arcs,
+    // and explode when clicked. They avoid landing on the logo and buttons.
+    // =============================================================================
+
+    (function initFrogs() {
+      // --- CONFIGURATION ---
+      const FROG_CONFIG = {
+        tileWidth: 48,
+        tileHeight: 48,
+        sheetColumns: 9,
+        sheetRows: 5,
+        displayScale: 2,  // Render frogs at 2x size (96x96)
+        maxFrogsDesktop: 5,
+        maxFrogsMobile: 2,
+        spawnIntervalMin: 10000,  // 10 seconds
+        spawnIntervalMax: 20000,  // 20 seconds
+        hopDuration: 400,         // 400ms per hop
+        hopHeight: 8,             // 8px arc height
+        idleDelayMin: 3000,       // 3 seconds
+        idleDelayMax: 8000,       // 8 seconds
+        mobileBreakpoint: 768
+      };
+
+      const ANIMATIONS = {
+        idle:      { rowIndex: 0, startCol: 0, frameCount: 8, fps: 10, loop: true },
+        hop:       { rowIndex: 1, startCol: 0, frameCount: 7, fps: 17, loop: false },
+        explosion: { rowIndex: 4, startCol: 0, frameCount: 9, fps: 18, loop: false }
+      };
+
+      const VARIANTS = ['BlueBlue', 'BlueBrown', 'GreenBlue', 'GreenBrown', 'PurpleBlue', 'PurpleWhite'];
+
+      // --- STATE ---
+      const frogCanvas = document.getElementById('frogCanvas');
+      const frogCtx = frogCanvas.getContext('2d');
+      const frogs = [];
+      const frogSheets = {};  // variant -> Image
+      let sheetsLoaded = 0;
+      let exclusionZones = [];  // Array of {x, y, width, height}
+      let lastTime = 0;
+
+      // --- PRELOAD SPRITESHEETS ---
+      function preloadFrogSheets(callback) {
+        VARIANTS.forEach(variant => {
+          const img = new Image();
+          img.onload = () => {
+            frogSheets[variant] = img;
+            sheetsLoaded++;
+            if (sheetsLoaded === VARIANTS.length) {
+              callback();
+            }
+          };
+          img.onerror = () => {
+            console.warn(`Failed to load frog sheet: ${variant}`);
+            sheetsLoaded++;
+            if (sheetsLoaded === VARIANTS.length) {
+              callback();
+            }
+          };
+          img.src = `toxic_frog/${variant}/ToxicFrog${variant}_Sheet.png`;
+        });
+      }
+
+      // --- CANVAS SIZING ---
+      function resizeFrogCanvas() {
+        const dpr = window.devicePixelRatio || 1;
+        frogCanvas.width = window.innerWidth * dpr;
+        frogCanvas.height = window.innerHeight * dpr;
+        frogCanvas.style.width = window.innerWidth + 'px';
+        frogCanvas.style.height = window.innerHeight + 'px';
+        frogCtx.setTransform(1, 0, 0, 1, 0, 0);
+        frogCtx.scale(dpr, dpr);
+        updateExclusionZones();
+      }
+
+      // --- EXCLUSION ZONES ---
+      function updateExclusionZones() {
+        exclusionZones = [];
+        const logoEl = document.querySelector('.logo-container');
+        const buttonsEl = document.querySelector('.buttons');
+        
+        if (logoEl) {
+          const rect = logoEl.getBoundingClientRect();
+          exclusionZones.push({
+            x: rect.left,
+            y: rect.top,
+            width: rect.width,
+            height: rect.height
+          });
+        }
+        if (buttonsEl) {
+          const rect = buttonsEl.getBoundingClientRect();
+          exclusionZones.push({
+            x: rect.left,
+            y: rect.top,
+            width: rect.width,
+            height: rect.height
+          });
+        }
+      }
+
+      function isInExclusionZone(x, y) {
+        const frogSize = FROG_CONFIG.tileWidth * FROG_CONFIG.displayScale;
+        const centerX = x + frogSize / 2;
+        const centerY = y + frogSize / 2;
+        
+        for (const zone of exclusionZones) {
+          if (centerX >= zone.x && centerX <= zone.x + zone.width &&
+              centerY >= zone.y && centerY <= zone.y + zone.height) {
+            return true;
+          }
+        }
+        return false;
+      }
+
+      // --- FROG CLASS ---
+      class Frog {
+        constructor(x, y, variant) {
+          this.x = x;
+          this.y = y;
+          this.variant = variant;
+          this.state = 'idle';
+          this.frameIndex = 0;
+          this.frameTimer = 0;
+          this.hopProgress = 0;
+          this.hopStartX = x;
+          this.hopStartY = y;
+          this.targetX = x;
+          this.targetY = y;
+          this.hopTimeout = null;
+          this.facingLeft = Math.random() > 0.5;
+          this.scheduleNextHop();
+        }
+
+        scheduleNextHop() {
+          const delay = FROG_CONFIG.idleDelayMin + 
+            Math.random() * (FROG_CONFIG.idleDelayMax - FROG_CONFIG.idleDelayMin);
+          this.hopTimeout = setTimeout(() => this.startHop(), delay);
+        }
+
+        startHop() {
+          if (this.state === 'exploding') return;
+          
+          // Pick random target position
+          const frogSize = FROG_CONFIG.tileWidth * FROG_CONFIG.displayScale;
+          const margin = frogSize;
+          let attempts = 0;
+          let targetX, targetY;
+          
+          do {
+            targetX = margin + Math.random() * (window.innerWidth - 2 * margin);
+            targetY = margin + Math.random() * (window.innerHeight - 2 * margin);
+            attempts++;
+          } while (isInExclusionZone(targetX, targetY) && attempts < 20);
+          
+          this.hopStartX = this.x;
+          this.hopStartY = this.y;
+          this.targetX = targetX;
+          this.targetY = targetY;
+          this.hopProgress = 0;
+          this.state = 'hop';
+          this.frameIndex = 0;
+          this.frameTimer = 0;
+          
+          // Update facing direction
+          if (this.targetX < this.x) {
+            this.facingLeft = true;
+          } else if (this.targetX > this.x) {
+            this.facingLeft = false;
+          }
+        }
+
+        explode() {
+          if (this.state === 'exploding') return;
+          if (this.hopTimeout) clearTimeout(this.hopTimeout);
+          this.state = 'exploding';
+          this.frameIndex = 0;
+          this.frameTimer = 0;
+        }
+
+        update(deltaTime) {
+          const anim = ANIMATIONS[this.state];
+          if (!anim) return;
+
+          // Update frame
+          const frameDuration = 1000 / anim.fps;
+          this.frameTimer += deltaTime;
+          
+          if (this.frameTimer >= frameDuration) {
+            this.frameTimer -= frameDuration;
+            this.frameIndex++;
+            
+            if (this.frameIndex >= anim.frameCount) {
+              if (anim.loop) {
+                this.frameIndex = 0;
+              } else {
+                this.frameIndex = anim.frameCount - 1;
+                
+                if (this.state === 'hop') {
+                  // Hop animation finished, snap to target and go idle
+                  this.x = this.targetX;
+                  this.y = this.targetY;
+                  this.state = 'idle';
+                  this.frameIndex = 0;
+                  this.scheduleNextHop();
+                } else if (this.state === 'exploding') {
+                  // Mark for removal
+                  this.dead = true;
+                }
+              }
+            }
+          }
+
+          // Update position during hop
+          if (this.state === 'hop') {
+            this.hopProgress += deltaTime / FROG_CONFIG.hopDuration;
+            if (this.hopProgress > 1) this.hopProgress = 1;
+            
+            const t = this.hopProgress;
+            // Linear X interpolation
+            this.x = this.hopStartX + (this.targetX - this.hopStartX) * t;
+            // Parabolic Y with arc
+            const baseY = this.hopStartY + (this.targetY - this.hopStartY) * t;
+            const arcOffset = -4 * FROG_CONFIG.hopHeight * t * (1 - t);
+            this.y = baseY + arcOffset;
+          }
+        }
+
+        draw(ctx) {
+          const sheet = frogSheets[this.variant];
+          if (!sheet) return;
+
+          const anim = ANIMATIONS[this.state];
+          if (!anim) return;
+
+          const col = anim.startCol + this.frameIndex;
+          const row = anim.rowIndex;
+          const sx = col * FROG_CONFIG.tileWidth;
+          const sy = row * FROG_CONFIG.tileHeight;
+          const dw = FROG_CONFIG.tileWidth * FROG_CONFIG.displayScale;
+          const dh = FROG_CONFIG.tileHeight * FROG_CONFIG.displayScale;
+
+          ctx.save();
+          
+          if (this.facingLeft) {
+            // Flip horizontally
+            ctx.translate(this.x + dw, this.y);
+            ctx.scale(-1, 1);
+            ctx.drawImage(
+              sheet,
+              sx, sy, FROG_CONFIG.tileWidth, FROG_CONFIG.tileHeight,
+              0, 0, dw, dh
+            );
+          } else {
+            ctx.drawImage(
+              sheet,
+              sx, sy, FROG_CONFIG.tileWidth, FROG_CONFIG.tileHeight,
+              this.x, this.y, dw, dh
+            );
+          }
+          
+          ctx.restore();
+        }
+
+        containsPoint(px, py) {
+          const dw = FROG_CONFIG.tileWidth * FROG_CONFIG.displayScale;
+          const dh = FROG_CONFIG.tileHeight * FROG_CONFIG.displayScale;
+          return px >= this.x && px <= this.x + dw &&
+                 py >= this.y && py <= this.y + dh;
+        }
+      }
+
+      // --- SPAWNING ---
+      function getMaxFrogs() {
+        return window.innerWidth < FROG_CONFIG.mobileBreakpoint 
+          ? FROG_CONFIG.maxFrogsMobile 
+          : FROG_CONFIG.maxFrogsDesktop;
+      }
+
+      function spawnFrog() {
+        if (frogs.length >= getMaxFrogs()) {
+          scheduleNextSpawn();
+          return;
+        }
+
+        // Pick random edge
+        const frogSize = FROG_CONFIG.tileWidth * FROG_CONFIG.displayScale;
+        const edge = Math.floor(Math.random() * 4);
+        let x, y;
+        
+        switch (edge) {
+          case 0: // Top
+            x = Math.random() * (window.innerWidth - frogSize);
+            y = -frogSize;
+            break;
+          case 1: // Right
+            x = window.innerWidth;
+            y = Math.random() * (window.innerHeight - frogSize);
+            break;
+          case 2: // Bottom
+            x = Math.random() * (window.innerWidth - frogSize);
+            y = window.innerHeight;
+            break;
+          case 3: // Left
+            x = -frogSize;
+            y = Math.random() * (window.innerHeight - frogSize);
+            break;
+        }
+
+        const variant = VARIANTS[Math.floor(Math.random() * VARIANTS.length)];
+        const frog = new Frog(x, y, variant);
+        
+        // Immediately start hopping into view
+        frog.startHop();
+        frogs.push(frog);
+        
+        scheduleNextSpawn();
+      }
+
+      function scheduleNextSpawn() {
+        const delay = FROG_CONFIG.spawnIntervalMin + 
+          Math.random() * (FROG_CONFIG.spawnIntervalMax - FROG_CONFIG.spawnIntervalMin);
+        setTimeout(spawnFrog, delay);
+      }
+
+      // --- CLICK HANDLING ---
+      function handleClick(e) {
+        const rect = frogCanvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        
+        // Check frogs in reverse order (top-most first)
+        for (let i = frogs.length - 1; i >= 0; i--) {
+          if (frogs[i].containsPoint(x, y) && frogs[i].state !== 'exploding') {
+            frogs[i].explode();
+            break;
+          }
+        }
+      }
+
+      // --- RENDER LOOP ---
+      function frogAnimationLoop(currentTime) {
+        if (!lastTime) lastTime = currentTime;
+        const deltaTime = currentTime - lastTime;
+        lastTime = currentTime;
+
+        // Clear canvas
+        frogCtx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+
+        // Update and draw frogs
+        for (let i = frogs.length - 1; i >= 0; i--) {
+          frogs[i].update(deltaTime);
+          if (frogs[i].dead) {
+            frogs.splice(i, 1);
+          } else {
+            frogs[i].draw(frogCtx);
+          }
+        }
+
+        requestAnimationFrame(frogAnimationLoop);
+      }
+
+      // --- INITIALIZATION ---
+      function init() {
+        resizeFrogCanvas();
+        window.addEventListener('resize', resizeFrogCanvas);
+        document.addEventListener('click', handleClick);
+        
+        preloadFrogSheets(() => {
+          // Start spawning after a short initial delay
+          setTimeout(spawnFrog, 3000);
+          requestAnimationFrame(frogAnimationLoop);
+        });
+      }
+
+      init();
     })();
   </script>
 </body>
