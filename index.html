@@ -637,6 +637,24 @@
       };
 
       const VARIANTS = ['BlueBlue', 'BlueBrown', 'GreenBlue', 'GreenBrown', 'PurpleBlue', 'PurpleWhite'];
+      
+      // Shuffle function for better variant distribution
+      function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      }
+      
+      // Track last used variants to avoid repeats
+      let variantQueue = [];
+      function getRandomVariant() {
+        if (variantQueue.length === 0) {
+          variantQueue = shuffleArray([...VARIANTS]);
+        }
+        return variantQueue.pop();
+      }
 
       // --- STATE ---
       const frogCanvas = document.getElementById('frogCanvas');
@@ -925,7 +943,7 @@
             break;
         }
 
-        const variant = VARIANTS[Math.floor(Math.random() * VARIANTS.length)];
+        const variant = getRandomVariant();
         const frog = new Frog(x, y, variant);
         
         // Immediately start hopping into view
@@ -943,15 +961,17 @@
 
       // --- CLICK HANDLING ---
       function handleClick(e) {
-        const rect = frogCanvas.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        // Canvas is fixed at 0,0, so clientX/clientY are the coordinates
+        const x = e.clientX;
+        const y = e.clientY;
         
         // Check frogs in reverse order (top-most first)
         for (let i = frogs.length - 1; i >= 0; i--) {
           if (frogs[i].containsPoint(x, y) && frogs[i].state !== 'exploding') {
             frogs[i].explode();
-            break;
+            e.stopPropagation();
+            e.preventDefault();
+            return;  // Only explode one frog per click
           }
         }
       }
@@ -982,7 +1002,8 @@
       function init() {
         resizeFrogCanvas();
         window.addEventListener('resize', resizeFrogCanvas);
-        document.addEventListener('click', handleClick);
+        // Use capture phase so frog clicks are detected before other handlers
+        document.addEventListener('click', handleClick, true);
         
         preloadFrogSheets(() => {
           // Start spawning after a short initial delay
