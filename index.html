@@ -7,121 +7,18 @@
   <link rel="icon" type="image/png" sizes="192x192" href="/spudz_free.png" />
   <link rel="apple-touch-icon" href="/spudz_free.png" />
   <style>
-    :root {
-      --accent-main: #f84979;
-      --accent-dark: #d63c66;
-      --accent-darker: #b32d52;
-      --white: #ffffff;
-      --neutral-50: #fafafa;
-      --neutral-100: #f4f4f5;
-      --neutral-200: #e4e4e7;
-      --neutral-300: #d4d4d8;
-      --neutral-400: #a1a1aa;
-      --neutral-600: #696968;
-      --neutral-800: #3e3e3e;
-      --black: #000000;
-      --background: var(--neutral-50);
-      --text-primary: var(--neutral-800);
-      --text-secondary: var(--neutral-600);
-      --primary: var(--accent-main);
-      --primary-hover: var(--accent-dark);
-      --primary-foreground: var(--white);
-      --secondary-bg: var(--neutral-100);
-      --secondary-border: var(--neutral-300);
-      --border: var(--neutral-200);
-      --shadow-color: rgba(0, 0, 0, 0.12);
-    }
-    
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --background: var(--neutral-800);
-        --text-primary: var(--neutral-100);
-        --text-secondary: var(--neutral-400);
-        --border: #404040;
-        --secondary-bg: #333333;
-        --secondary-border: #505050;
-        --shadow-color: rgba(0, 0, 0, 0.4);
-      }
-    }
-
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
-      background: var(--background);
-      color: var(--text-primary);
+      background: #ffffff;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow-x: hidden;
-    }
-
-    /* Parallax Background Layers */
-    .parallax-bg {
-      position: fixed;
-      inset: 0;
-      z-index: -10;
-      overflow: hidden;
-    }
-
-    .bg-layer {
-      position: absolute;
-      inset: 0;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-
-    .bg-layer-1 {
-      background-image: url('bg/background1.png');
-      z-index: 1;
-    }
-
-    .bg-layer-2 {
-      background-image: url('bg/background2.png');
-      z-index: 2;
-    }
-
-    .bg-layer-3 {
-      background-image: url('bg/background3.png');
-      z-index: 3;
-    }
-
-    /* Floating Clouds */
-    .clouds-container {
-      position: absolute;
-      inset: 0;
-      z-index: 4;
-      pointer-events: none;
-    }
-
-    .cloud {
-      position: absolute;
-      background-size: contain;
-      background-repeat: no-repeat;
-      opacity: 0.8;
-      will-change: transform;
-    }
-
-    @keyframes drift-slow {
-      0% { transform: translateX(-20%); }
-      100% { transform: translateX(120vw); }
-    }
-
-    header {
-      padding: 1rem 1.5rem;
-      display: flex;
-      justify-content: center;
-    }
-
-    main {
-      flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 2rem;
       gap: 2.5rem;
+      padding: 2rem;
     }
 
     .logo-container {
@@ -131,20 +28,12 @@
       user-select: none;
     }
 
-    .logo {
-      width: 180px;
-      height: 180px;
-      transition: transform 0.1s ease;
-    }
-
-    /* Canvas replaces img for eye-tracking; same sizing */
     #spudzCanvas {
       width: 180px;
       height: 180px;
       transition: transform 0.1s ease;
     }
 
-    .logo-container:active .logo,
     .logo-container:active #spudzCanvas {
       transform: scale(0.95);
     }
@@ -155,7 +44,7 @@
       right: -20px;
       font-size: 1.5rem;
       font-weight: 700;
-      color: var(--accent-main);
+      color: #f84979;
       opacity: 0;
       transform: rotate(12deg);
       pointer-events: none;
@@ -178,8 +67,8 @@
       align-items: center;
       justify-content: center;
       text-decoration: none;
-      color: var(--primary-foreground);
-      background: var(--primary);
+      color: #ffffff;
+      background: #f84979;
       padding: 0.875rem 2.5rem;
       border-radius: 999px;
       font-weight: 600;
@@ -189,80 +78,24 @@
     }
 
     .btn:hover {
-      background: var(--primary-hover);
+      background: #d63c66;
       transform: translateY(-2px);
       box-shadow: 0 6px 20px rgba(248, 73, 121, 0.4);
     }
 
     .btn-secondary {
-      background: var(--secondary-bg);
-      color: var(--text-primary);
-      border: 1px solid var(--secondary-border);
-      box-shadow: 0 2px 8px var(--shadow-color);
+      background: #f4f4f5;
+      color: #3e3e3e;
+      border: 1px solid #d4d4d8;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     }
 
     .btn-secondary:hover {
-      background: var(--neutral-200);
-      box-shadow: 0 4px 12px var(--shadow-color);
-    }
-
-    @media (prefers-color-scheme: dark) {
-      .btn-secondary:hover {
-        background: #444444;
-      }
-    }
-
-    footer {
-      padding: 1.5rem;
-      text-align: center;
-      border-top: 1px solid var(--border);
-    }
-
-    .other-toggle {
-      background: none;
-      border: none;
-      color: var(--text-secondary);
-      font-size: 0.8rem;
-      cursor: pointer;
-      padding: 0.25rem 0.5rem;
-      opacity: 0.6;
-      transition: opacity 0.2s ease;
-    }
-
-    .other-toggle:hover {
-      opacity: 1;
-    }
-
-    .other-links {
-      display: none;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      justify-content: center;
-      margin-top: 1rem;
-      padding-top: 1rem;
-      border-top: 1px solid var(--border);
-    }
-
-    .other-links.show {
-      display: flex;
-    }
-
-    .other-links a {
-      color: var(--text-secondary);
-      text-decoration: none;
-      font-size: 0.85rem;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-      transition: color 0.2s ease, background 0.2s ease;
-    }
-
-    .other-links a:hover {
-      color: var(--text-primary);
-      background: var(--secondary-bg);
+      background: #e4e4e7;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
     }
 
     @media (max-width: 480px) {
-      .logo,
       #spudzCanvas {
         width: 140px;
         height: 140px;
@@ -281,97 +114,49 @@
   </style>
 </head>
 <body>
-  <!-- Parallax Background -->
-  <div class="parallax-bg">
-    <div class="bg-layer bg-layer-1"></div>
-    <div class="bg-layer bg-layer-2"></div>
-    <div class="bg-layer bg-layer-3"></div>
-    <div class="clouds-container" id="cloudsContainer"></div>
+  <div class="logo-container" id="logoContainer">
+    <canvas id="spudzCanvas" width="180" height="180" aria-label="Badgey" role="img"></canvas>
+    <span class="ow-text" id="owText">OW!</span>
   </div>
 
-  <header></header>
-  
-  <main>
-    <div class="logo-container" id="logoContainer">
-      <!-- Canvas for eye-tracking spritesheet rendering; replaces static img -->
-      <canvas id="spudzCanvas" width="180" height="180" aria-label="Badgey" role="img"></canvas>
-      <span class="ow-text" id="owText">OW!</span>
-    </div>
-
-    <div class="buttons">
-      <a href="https://go.badgey.org" class="btn">Go</a>
-      <a href="https://flashcards.badgey.org" class="btn btn-secondary">Flashcards</a>
-    </div>
-  </main>
-
-  <footer>
-    <button class="other-toggle" id="otherToggle">other</button>
-    <div class="other-links" id="otherLinks">
-      <a href="https://quest.badgey.org">Quest</a>
-      <a href="https://sprite.badgey.org">Sprite</a>
-      <a href="https://draw.badgey.org">SVG Draw</a>
-      <a href="https://app.badgey.org">Gmail Tool</a>
-      <a href="https://piano.badgey.org">Piano</a>
-      <a href="https://conferences.badgey.org">Conferences</a>
-      <a href="https://lisa.badgey.org">Lisa Bar Low</a>
-      <a href="https://settings.badgey.org">Settings</a>
-      <a href="https://badgercite.com">Badgercite</a>
-    </div>
-  </footer>
+  <div class="buttons">
+    <a href="https://go.badgey.org" class="btn">Go</a>
+    <a href="https://flashcards.badgey.org" class="btn btn-secondary">Flashcards</a>
+  </div>
 
   <script>
-    // =============================================================================
-    // SPUDZ EYE-TRACKING SYSTEM
-    // =============================================================================
-    // Spritesheet: spudz_eyez_4096x5120.png (4096×5120, 8 cols × 10 rows, 512×512 per cell)
-    //   - Columns (0-7): horizontal gaze direction (left → right)
-    //   - Rows (0-9): vertical gaze direction (up → down)
-    //   - Center gaze: approximately col=3-4, row=4-5
-    //
-    // Tunable constants below for range, smoothing, and idle drift behavior.
-    // Wince state overrides idle-follow: on click, show OW image for 500ms.
-    // =============================================================================
-
     // --- TUNABLE CONSTANTS ---
-    const RANGE_PX = 250;              // Pixel distance to normalize cursor offset to [-1, 1]
-    const SMOOTHING_ALPHA = 0.15;      // Lerp speed for eye movement (0-1, higher = faster)
-    const IDLE_DRIFT_MIN_MS = 2000;    // Minimum time between idle gaze shifts
-    const IDLE_DRIFT_MAX_MS = 4000;    // Maximum time between idle gaze shifts
-    const IDLE_DRIFT_RANGE = 2;        // Max grid cells from center for idle drift
-    const WINCE_DURATION_MS = 500;     // How long wince state lasts
-    const SPRITESHEET_SCALE = 1.1;     // Scale factor for spritesheet frames to match OW size (1.0 = no scale)
+    const RANGE_PX = 250;
+    const SMOOTHING_ALPHA = 0.15;
+    const IDLE_DRIFT_MIN_MS = 2000;
+    const IDLE_DRIFT_MAX_MS = 4000;
+    const IDLE_DRIFT_RANGE = 2;
+    const WINCE_DURATION_MS = 500;
+    const SPRITESHEET_SCALE = 1.1;
 
     // --- SPRITESHEET CONSTANTS ---
     const SPRITE_COLS = 8;
     const SPRITE_ROWS = 10;
-    const SPRITE_CELL_SIZE = 512;  // 512x512 cells in 4096x5120 sheet
-    const CENTER_COL = 3.5;  // Center of horizontal gaze
-    const CENTER_ROW = 4.5;  // Center of vertical gaze
+    const SPRITE_CELL_SIZE = 512;
 
     // --- DOM ELEMENTS ---
     const canvas = document.getElementById('spudzCanvas');
     const ctx = canvas.getContext('2d');
     const owText = document.getElementById('owText');
     const logoContainer = document.getElementById('logoContainer');
-    const otherToggle = document.getElementById('otherToggle');
-    const otherLinks = document.getElementById('otherLinks');
 
     // --- STATE ---
-    let state = 'idle_follow';  // 'idle_follow' | 'wince'
-    let smoothedDx = 0;         // Smoothed normalized X offset [-1, 1]
-    let smoothedDy = 0;         // Smoothed normalized Y offset [-1, 1]
-    let targetDx = 0;           // Target X (from mouse or idle drift)
-    let targetDy = 0;           // Target Y (from mouse or idle drift)
-    let hasMouseActivity = false;  // True if mouse is actively tracking
+    let state = 'idle_follow';
+    let smoothedDx = 0;
+    let smoothedDy = 0;
+    let targetDx = 0;
+    let targetDy = 0;
+    let hasMouseActivity = false;
     let idleDriftTimeout = null;
     let winceTimeout = null;
 
     // --- IMAGE PRELOADING ---
-    const images = {
-      spritesheet: null,
-      idle: null,
-      wince: null
-    };
+    const images = { spritesheet: null, idle: null, wince: null };
     let imagesLoaded = 0;
     const TOTAL_IMAGES = 3;
 
@@ -386,15 +171,12 @@
         img.onload = () => {
           images[key] = img;
           imagesLoaded++;
-          if (imagesLoaded === TOTAL_IMAGES) {
-            startAnimationLoop();
-          }
+          if (imagesLoaded === TOTAL_IMAGES) startAnimationLoop();
         };
         img.src = src;
       }
     }
 
-    // --- CANVAS SIZING (DPR-aware) ---
     function resizeCanvas() {
       const rect = canvas.getBoundingClientRect();
       const dpr = window.devicePixelRatio || 1;
@@ -403,14 +185,11 @@
       ctx.scale(dpr, dpr);
     }
 
-    // --- GRID INDEX CALCULATION ---
     function clamp(val, min, max) {
       return Math.max(min, Math.min(max, val));
     }
 
     function getGridIndices(dx, dy) {
-      // dx, dy are normalized to [-1, 1]
-      // Convert to grid indices
       const col = Math.round(((dx + 1) / 2) * (SPRITE_COLS - 1));
       const row = Math.round(((dy + 1) / 2) * (SPRITE_ROWS - 1));
       return {
@@ -419,20 +198,15 @@
       };
     }
 
-    // --- IDLE DRIFT (when no mouse activity) ---
     function scheduleIdleDrift() {
       if (idleDriftTimeout) clearTimeout(idleDriftTimeout);
       const delay = IDLE_DRIFT_MIN_MS + Math.random() * (IDLE_DRIFT_MAX_MS - IDLE_DRIFT_MIN_MS);
       idleDriftTimeout = setTimeout(() => {
         if (!hasMouseActivity && state === 'idle_follow') {
-          // Pick a random offset near center
           const offsetCol = (Math.random() - 0.5) * 2 * IDLE_DRIFT_RANGE;
           const offsetRow = (Math.random() - 0.5) * 2 * IDLE_DRIFT_RANGE;
-          // Convert to normalized [-1, 1] space
-          targetDx = offsetCol / (SPRITE_COLS / 2);
-          targetDy = offsetRow / (SPRITE_ROWS / 2);
-          targetDx = clamp(targetDx, -0.4, 0.4);  // Keep near center
-          targetDy = clamp(targetDy, -0.4, 0.4);
+          targetDx = clamp(offsetCol / (SPRITE_COLS / 2), -0.4, 0.4);
+          targetDy = clamp(offsetRow / (SPRITE_ROWS / 2), -0.4, 0.4);
         }
         scheduleIdleDrift();
       }, delay);
@@ -443,27 +217,22 @@
       targetDy = 0;
     }
 
-    // --- MOUSE TRACKING ---
     let mouseActivityTimeout = null;
 
     function handleMouseMove(e) {
       if (state !== 'idle_follow') return;
-
       hasMouseActivity = true;
       if (mouseActivityTimeout) clearTimeout(mouseActivityTimeout);
       mouseActivityTimeout = setTimeout(() => {
         hasMouseActivity = false;
         resetToCenter();
-      }, 3000);  // Consider mouse inactive after 3s of no movement
+      }, 3000);
 
       const rect = canvas.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
-
       const dx = e.clientX - centerX;
       const dy = e.clientY - centerY;
-
-      // Normalize to [-1, 1] based on RANGE_PX
       targetDx = clamp(dx / RANGE_PX, -1, 1);
       targetDy = clamp(dy / RANGE_PX, -1, 1);
     }
@@ -473,18 +242,14 @@
       resetToCenter();
     }
 
-    // --- RENDERING ---
     function render() {
       const displayWidth = canvas.getBoundingClientRect().width;
       const displayHeight = canvas.getBoundingClientRect().height;
-
       ctx.clearRect(0, 0, displayWidth, displayHeight);
 
       if (state === 'wince' && images.wince) {
-        // Draw wince image
         ctx.drawImage(images.wince, 0, 0, displayWidth, displayHeight);
       } else if (images.spritesheet) {
-        // Draw eye-tracking frame from spritesheet (scaled to match OW size)
         const { col, row } = getGridIndices(smoothedDx, smoothedDy);
         const sx = col * SPRITE_CELL_SIZE;
         const sy = row * SPRITE_CELL_SIZE;
@@ -498,17 +263,13 @@
           offsetX, offsetY, scaledW, scaledH
         );
       } else if (images.idle) {
-        // Fallback to idle image while spritesheet loads
         ctx.drawImage(images.idle, 0, 0, displayWidth, displayHeight);
       }
     }
 
-    // --- ANIMATION LOOP ---
     function animationLoop() {
-      // Smooth lerp toward target
       smoothedDx += (targetDx - smoothedDx) * SMOOTHING_ALPHA;
       smoothedDy += (targetDy - smoothedDy) * SMOOTHING_ALPHA;
-
       render();
       requestAnimationFrame(animationLoop);
     }
@@ -519,78 +280,21 @@
       animationLoop();
     }
 
-    // --- CLICK HANDLER (WINCE) ---
     logoContainer.addEventListener('click', () => {
-      // Set state to wince, overriding eye tracking
       state = 'wince';
       owText.classList.add('show');
-
-      // Clear any pending wince timeout
       if (winceTimeout) clearTimeout(winceTimeout);
-
       winceTimeout = setTimeout(() => {
         state = 'idle_follow';
         owText.classList.remove('show');
       }, WINCE_DURATION_MS);
     });
 
-    // --- EVENT LISTENERS ---
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseleave', handleMouseLeave);
     window.addEventListener('resize', resizeCanvas);
 
-    // --- INITIALIZATION ---
     preloadImages();
-
-    // --- OTHER LINKS TOGGLE (existing functionality) ---
-    otherToggle.addEventListener('click', () => {
-      otherLinks.classList.toggle('show');
-      otherToggle.textContent = otherLinks.classList.contains('show') ? 'hide' : 'other';
-    });
-
-    // --- FLOATING CLOUDS ---
-    (function initClouds() {
-      const container = document.getElementById('cloudsContainer');
-      if (!container) return;
-
-      const cloudImages = [
-        'bg/cloud1.png', 'bg/cloud2.png', 'bg/cloud3.png', 'bg/cloud4.png',
-        'bg/cloud5.png', 'bg/cloud6.png', 'bg/cloud7.png', 'bg/cloud8.png'
-      ];
-
-      // Spawn 6-8 clouds at various positions
-      const cloudCount = 6 + Math.floor(Math.random() * 3);
-      
-      for (let i = 0; i < cloudCount; i++) {
-        const cloud = document.createElement('div');
-        cloud.className = 'cloud';
-        
-        // Random cloud image
-        const imgSrc = cloudImages[Math.floor(Math.random() * cloudImages.length)];
-        cloud.style.backgroundImage = `url('${imgSrc}')`;
-        
-        // Random size (80-200px width)
-        const size = 80 + Math.random() * 120;
-        cloud.style.width = `${size}px`;
-        cloud.style.height = `${size * 0.6}px`;
-        
-        // Random vertical position (top 60% of screen)
-        cloud.style.top = `${Math.random() * 50}%`;
-        
-        // Random starting horizontal position
-        cloud.style.left = `${-10 + Math.random() * 100}%`;
-        
-        // Gentle drift animation (60-120 seconds per cycle)
-        const duration = 60 + Math.random() * 60;
-        const delay = Math.random() * -duration; // Stagger start times
-        const direction = Math.random() > 0.5 ? 'normal' : 'reverse';
-        
-        cloud.style.animation = `drift-slow ${duration}s linear ${delay}s infinite ${direction}`;
-        cloud.style.opacity = 0.5 + Math.random() * 0.4;
-        
-        container.appendChild(cloud);
-      }
-    })();
   </script>
 </body>
 </html>
